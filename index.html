@@ -167,7 +167,7 @@
         .gps-btn { background: var(--accent-blue); color: #fff; border: none; }
         .back-home-btn { background: #ef4444; color: #fff; border: none; }
 
-        /* دکمه‌های کنترل زوم شناور در سمت چپ پایین */
+        /* دکمه‌های کنترل زوم */
         .zoom-controls {
             position: absolute; bottom: 30px; left: 20px;
             display: flex; flex-direction: column; gap: 8px; z-index: 300;
@@ -241,14 +241,18 @@
             html[dir="ltr"] .gis-sidebar { left: -100%; right: auto; }
             .gis-sidebar.open { right: 0; left: auto; }
             
-            /* در موبایل باکس اطلاعات دقیقاً وسط صفحه فیکس شود تا کاملاً خوانا باشد */
+            /* در موبایل، باکس اطلاعات دقیقاً در پایین صفحه فیکس می‌شود */
             .hud-panel {
-                width: 85%; max-width: 320px;
-                top: 50% !important; left: 50% !important;
-                transform: translate(-50%, -50%) scale(0.9) !important;
+                width: 92% !important;
+                max-width: none;
+                left: 4% !important;
+                bottom: 20px !important;
+                top: auto !important;
+                transform: translateY(20px);
+                transition: opacity 0.3s ease, transform 0.3s ease;
             }
             .hud-panel.visible {
-                transform: translate(-50%, -50%) scale(1) !important;
+                transform: translateY(0) !important;
             }
         }
     </style>
@@ -342,7 +346,7 @@
                 </div>
             </div>
 
-            <!-- کنترل‌های زوم دستی روی صفحه -->
+            <!-- دکمه‌های کنترل زوم -->
             <div class="zoom-controls">
                 <button class="zoom-btn" onclick="zoomIn()">+</button>
                 <button class="zoom-btn" onclick="zoomOut()">-</button>
@@ -536,7 +540,6 @@
         let activeItem = null;
         let activeKey = "";
 
-        // متغیرهای مدیریت لمس دو انگشتی (Pinch to Zoom)
         let initialPinchDistance = null;
         let startScale = 1;
 
@@ -560,12 +563,14 @@
             updateTransform();
         }
 
+        // تابع دقیق برای آوردن لوکیشن به مرکز صفحه
         function smoothPanTo(targetLeftPct, targetTopPct) {
             const vW = viewport.clientWidth;
             const vH = viewport.clientHeight;
             if(vW === 0 || vH === 0) return;
 
-            if (scale < 1.0) scale = 1.2;
+            // اگر زوم خیلی پایین بود، هنگام کلیک کمی روی آن زوم شود
+            if (scale < 1.2) scale = 1.4;
 
             const targetPixelX = (targetLeftPct / 100) * 2400;
             const targetPixelY = (targetTopPct / 100) * 1600;
@@ -596,7 +601,6 @@
 
         window.addEventListener('resize', initView);
 
-        // رویدادهای ماوس (دسکتاپ)
         viewport.addEventListener('mousedown', (e) => {
             isPanning = true; 
             startX = e.clientX - posX; 
@@ -610,7 +614,6 @@
         });
         window.addEventListener('mouseup', () => { isPanning = false; });
 
-        // رویدادهای لمسی (موبایل: جابجایی تک انگشتی و زوم دو انگشتی)
         viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isPanning = true;
@@ -649,7 +652,6 @@
             if (e.touches.length === 0) isPanning = false;
         });
 
-        // اسکرول ماوس برای زوم
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const zoomRate = 0.12, prevScale = scale;
@@ -664,7 +666,6 @@
             updateTransform();
         }, { passive: false });
 
-        // دکمه‌های زوم مثبت و منفی
         function zoomIn() {
             const prevScale = scale;
             scale = Math.min(scale * 1.25, 5.0);
@@ -789,7 +790,7 @@
             hudTitle.textContent = loc.title;
             hudDescription.textContent = loc.desc;
 
-            // موقعیت‌دهی برای دسکتاپ (روی موبایل از طریق CSS Media Query دقیقاً وسط صفحه فیکس می‌شود)
+            // مختصات‌دهی برای دسکتاپ (در موبایل از طریق Media Query در CSS خودکار در پایین صفحه فیکس می‌شود)
             hudPanel.style.left = `calc(${loc.left}% + 15px)`;
             hudPanel.style.top = `calc(${loc.top}% - 15px)`;
             hudPanel.classList.add('visible');
