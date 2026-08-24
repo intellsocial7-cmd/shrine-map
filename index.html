@@ -167,6 +167,21 @@
         .gps-btn { background: var(--accent-blue); color: #fff; border: none; }
         .back-home-btn { background: #ef4444; color: #fff; border: none; }
 
+        /* دکمه‌های کنترل زوم شناور در سمت چپ پایین */
+        .zoom-controls {
+            position: absolute; bottom: 30px; left: 20px;
+            display: flex; flex-direction: column; gap: 8px; z-index: 300;
+        }
+        .zoom-btn {
+            width: 42px; height: 42px; background: var(--bg-card);
+            backdrop-filter: blur(16px); border: 1px solid var(--border-glass);
+            color: var(--text-main); font-size: 20px; font-weight: bold;
+            border-radius: 12px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; box-shadow: var(--shadow-elevated);
+            transition: all 0.2s ease;
+        }
+        .zoom-btn:hover { background: var(--accent-gold); color: #020617; border-color: var(--accent-gold); }
+
         .gis-sidebar {
             position: absolute; top: 0; right: -440px; width: 420px; height: 100%;
             background: var(--bg-card); backdrop-filter: blur(24px);
@@ -225,13 +240,22 @@
             .gis-sidebar { width: 100%; right: -100%; left: auto; max-width: none; }
             html[dir="ltr"] .gis-sidebar { left: -100%; right: auto; }
             .gis-sidebar.open { right: 0; left: auto; }
-            .hud-panel { width: 240px; }
+            
+            /* در موبایل باکس اطلاعات دقیقاً وسط صفحه فیکس شود تا کاملاً خوانا باشد */
+            .hud-panel {
+                width: 85%; max-width: 320px;
+                top: 50% !important; left: 50% !important;
+                transform: translate(-50%, -50%) scale(0.9) !important;
+            }
+            .hud-panel.visible {
+                transform: translate(-50%, -50%) scale(1) !important;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- صفحه اسپلش[cite: 2] -->
+    <!-- صفحه اسپلش -->
     <div id="splashScreen">
         <div class="splash-container">
             <div class="logo-box">
@@ -267,7 +291,7 @@
         </div>
     </div>
 
-    <!-- نقشه GIS اصلی[cite: 1] -->
+    <!-- نقشه GIS اصلی -->
     <div id="gisAppContainer">
         <div class="gis-platform-container">
             <div class="map-viewport" id="mapViewport">
@@ -316,6 +340,12 @@
                     <div class="sub-hotspot wc" style="top: 22.5%; left: 38.5%;" data-id="WC4" data-key="wc_4">🚻</div>
                     <div class="sub-hotspot wc" style="top: 71.0%; left: 91.5%;" data-id="WC5" data-key="wc_5">🚻</div>
                 </div>
+            </div>
+
+            <!-- کنترل‌های زوم دستی روی صفحه -->
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                <button class="zoom-btn" onclick="zoomOut()">-</button>
             </div>
 
             <div class="gis-topbar">
@@ -501,9 +531,14 @@
         const gisSidebar = document.getElementById('gisSidebar');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-        let scale = 1, posX = 0, posY = 0, isPanning = false, startX, startY;
+        let scale = 1, posX = 0, posY = 0;
+        let isPanning = false, startX, startY;
         let activeItem = null;
         let activeKey = "";
+
+        // متغیرهای مدیریت لمس دو انگشتی (Pinch to Zoom)
+        let initialPinchDistance = null;
+        let startScale = 1;
 
         function updateTransform() {
             canvas.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
@@ -525,13 +560,11 @@
             updateTransform();
         }
 
-        // تابع انیمیشن نرم برای جابجایی نقشه به سمت مختصات دلخواه (پین یا آیتم منو)
         function smoothPanTo(targetLeftPct, targetTopPct) {
             const vW = viewport.clientWidth;
             const vH = viewport.clientHeight;
             if(vW === 0 || vH === 0) return;
 
-            // در صورتی که زوم کم بود، روی مکان مورد نظر زوم مناسب هم بکنیم (مثلاً مقیاس 1.2 یا حفظ مقیاس فعلی)
             if (scale < 1.0) scale = 1.2;
 
             const targetPixelX = (targetLeftPct / 100) * 2400;
@@ -540,16 +573,14 @@
             const finalX = (vW / 2) - (targetPixelX * scale);
             const finalY = (vH / 2) - (targetPixelY * scale);
 
-            // انیمیشن نرم با استفاده از فریم‌رید
             const startX = posX;
             const startY = posY;
             const startTime = performance.now();
-            const duration = 500; // مدت زمان انیمیشن به میلی‌ثانیه
+            const duration = 500;
 
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // تابع تسهیل (Ease Out)
                 const ease = 1 - Math.pow(1 - progress, 3);
 
                 posX = startX + (finalX - startX) * ease;
@@ -565,6 +596,7 @@
 
         window.addEventListener('resize', initView);
 
+        // رویدادهای ماوس (دسکتاپ)
         viewport.addEventListener('mousedown', (e) => {
             isPanning = true; 
             startX = e.clientX - posX; 
@@ -578,21 +610,46 @@
         });
         window.addEventListener('mouseup', () => { isPanning = false; });
 
+        // رویدادهای لمسی (موبایل: جابجایی تک انگشتی و زوم دو انگشتی)
         viewport.addEventListener('touchstart', (e) => {
-            if(e.touches.length === 1) {
+            if (e.touches.length === 1) {
                 isPanning = true;
                 startX = e.touches[0].clientX - posX;
                 startY = e.touches[0].clientY - posY;
+                initialPinchDistance = null;
+            } else if (e.touches.length === 2) {
+                isPanning = false;
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                startScale = scale;
             }
         }, {passive: true});
-        viewport.addEventListener('touchmove', (e) => {
-            if (!isPanning || e.touches.length !== 1) return;
-            posX = e.touches[0].clientX - startX;
-            posY = e.touches[0].clientY - startY;
-            updateTransform();
-        }, {passive: true});
-        viewport.addEventListener('touchend', () => { isPanning = false; });
 
+        viewport.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1 && isPanning) {
+                posX = e.touches[0].clientX - startX;
+                posY = e.touches[0].clientY - startY;
+                updateTransform();
+            } else if (e.touches.length === 2 && initialPinchDistance !== null) {
+                const currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const zoomFactor = currentDistance / initialPinchDistance;
+                let newScale = startScale * zoomFactor;
+                scale = Math.min(Math.max(newScale, 0.3), 5.0);
+                updateTransform();
+            }
+        }, {passive: true});
+
+        viewport.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) initialPinchDistance = null;
+            if (e.touches.length === 0) isPanning = false;
+        });
+
+        // اسکرول ماوس برای زوم
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const zoomRate = 0.12, prevScale = scale;
@@ -606,6 +663,29 @@
             posY = mY - (mY - posY) * (scale / prevScale);
             updateTransform();
         }, { passive: false });
+
+        // دکمه‌های زوم مثبت و منفی
+        function zoomIn() {
+            const prevScale = scale;
+            scale = Math.min(scale * 1.25, 5.0);
+            adjustZoomCenter(prevScale);
+        }
+
+        function zoomOut() {
+            const prevScale = scale;
+            scale = Math.max(scale / 1.25, 0.3);
+            adjustZoomCenter(prevScale);
+        }
+
+        function adjustZoomCenter(prevScale) {
+            const vW = viewport.clientWidth;
+            const vH = viewport.clientHeight;
+            const mX = vW / 2;
+            const mY = vH / 2;
+            posX = mX - (mX - posX) * (scale / prevScale);
+            posY = mY - (mY - posY) * (scale / prevScale);
+            updateTransform();
+        }
 
         function locateUser() {
             showUserPin(57.5, 83.5);
@@ -660,7 +740,6 @@
             const key = spot.getAttribute('data-key');
             const loc = translations.ar.locs[key];
             if (loc) {
-                // استخراج مختصات درصدی از استایل پین‌ها
                 const topVal = parseFloat(spot.style.top);
                 const leftVal = parseFloat(spot.style.left);
                 database.push({
@@ -691,7 +770,7 @@
                 `;
                 card.addEventListener('click', () => {
                     showLocationInfo(item);
-                    smoothPanTo(item.left, item.top); // حرکت نرم روی نقشه به سمت مکان انتخابی منو
+                    smoothPanTo(item.left, item.top);
                     toggleSidebar();
                 });
                 gisRecordsList.appendChild(card);
@@ -710,6 +789,7 @@
             hudTitle.textContent = loc.title;
             hudDescription.textContent = loc.desc;
 
+            // موقعیت‌دهی برای دسکتاپ (روی موبایل از طریق CSS Media Query دقیقاً وسط صفحه فیکس می‌شود)
             hudPanel.style.left = `calc(${loc.left}% + 15px)`;
             hudPanel.style.top = `calc(${loc.top}% - 15px)`;
             hudPanel.classList.add('visible');
@@ -722,7 +802,7 @@
                 const item = database.find(l => l.id === id);
                 if(item) {
                     showLocationInfo(item);
-                    smoothPanTo(item.left, item.top); // حرکت نرم روی نقشه هنگام کلیک روی پین‌ها
+                    smoothPanTo(item.left, item.top);
                 }
             });
         });
