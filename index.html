@@ -167,7 +167,6 @@
         .gps-btn { background: var(--accent-blue); color: #fff; border: none; }
         .back-home-btn { background: #ef4444; color: #fff; border: none; }
 
-        /* دکمه‌های کنترل زوم */
         .zoom-controls {
             position: absolute; bottom: 30px; left: 20px;
             display: flex; flex-direction: column; gap: 8px; z-index: 300;
@@ -222,6 +221,7 @@
         .record-details h4 { margin: 0 0 4px 0; font-size: 14px; color: var(--text-main); }
         .record-details span { font-size: 11px; color: var(--text-muted); }
 
+        /* استایل پنل اطلاعات */
         .hud-panel {
             position: absolute; width: 280px;
             background: var(--bg-card); backdrop-filter: blur(20px);
@@ -236,20 +236,21 @@
         .hud-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 8px; }
         .action-btn { background: var(--accent-gold); color: #020617; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 10px; cursor: pointer; }
 
+        /* تنظیمات مخصوص موبایل: باکس اطلاعات همیشه در پایین صفحه فیکس می‌شود */
         @media (max-width: 768px) {
             .gis-sidebar { width: 100%; right: -100%; left: auto; max-width: none; }
             html[dir="ltr"] .gis-sidebar { left: -100%; right: auto; }
             .gis-sidebar.open { right: 0; left: auto; }
             
-            /* در موبایل، باکس اطلاعات دقیقاً در پایین صفحه فیکس می‌شود */
             .hud-panel {
-                width: 92% !important;
-                max-width: none;
+                position: fixed !important;
                 left: 4% !important;
-                bottom: 20px !important;
+                right: 4% !important;
+                width: 92% !important;
+                bottom: 25px !important;
                 top: auto !important;
-                transform: translateY(20px);
-                transition: opacity 0.3s ease, transform 0.3s ease;
+                transform: translateY(30px) !important;
+                transition: opacity 0.3s ease, transform 0.3s ease !important;
             }
             .hud-panel.visible {
                 transform: translateY(0) !important;
@@ -259,7 +260,6 @@
 </head>
 <body>
 
-    <!-- صفحه اسپلش -->
     <div id="splashScreen">
         <div class="splash-container">
             <div class="logo-box">
@@ -295,7 +295,6 @@
         </div>
     </div>
 
-    <!-- نقشه GIS اصلی -->
     <div id="gisAppContainer">
         <div class="gis-platform-container">
             <div class="map-viewport" id="mapViewport">
@@ -346,7 +345,6 @@
                 </div>
             </div>
 
-            <!-- دکمه‌های کنترل زوم -->
             <div class="zoom-controls">
                 <button class="zoom-btn" onclick="zoomIn()">+</button>
                 <button class="zoom-btn" onclick="zoomOut()">-</button>
@@ -563,13 +561,11 @@
             updateTransform();
         }
 
-        // تابع دقیق برای آوردن لوکیشن به مرکز صفحه
         function smoothPanTo(targetLeftPct, targetTopPct) {
             const vW = viewport.clientWidth;
             const vH = viewport.clientHeight;
             if(vW === 0 || vH === 0) return;
 
-            // اگر زوم خیلی پایین بود، هنگام کلیک کمی روی آن زوم شود
             if (scale < 1.2) scale = 1.4;
 
             const targetPixelX = (targetLeftPct / 100) * 2400;
@@ -790,7 +786,7 @@
             hudTitle.textContent = loc.title;
             hudDescription.textContent = loc.desc;
 
-            // مختصات‌دهی برای دسکتاپ (در موبایل از طریق Media Query در CSS خودکار در پایین صفحه فیکس می‌شود)
+            // فقط در دسکتاپ باکس کنار پین قرار می‌گیرد؛ در موبایل توسط CSS در پایین صفحه فیکس می‌شود
             hudPanel.style.left = `calc(${loc.left}% + 15px)`;
             hudPanel.style.top = `calc(${loc.top}% - 15px)`;
             hudPanel.classList.add('visible');
