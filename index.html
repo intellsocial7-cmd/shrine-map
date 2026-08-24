@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg-base: #020617;
-            --bg-card: rgba(15, 23, 42, 0.95);
+            --bg-card: rgba(15, 23, 42, 0.96);
             --accent-gold: #f59e0b;
             --accent-blue: #3b82f6;
             --accent-green: #10b981;
@@ -19,7 +19,7 @@
 
         [data-theme="light"] {
             --bg-base: #f1f5f9;
-            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-card: rgba(255, 255, 255, 0.96);
             --accent-gold: #d97706;
             --accent-blue: #2563eb;
             --accent-green: #059669;
@@ -168,7 +168,7 @@
         .back-home-btn { background: #ef4444; color: #fff; border: none; }
 
         .zoom-controls {
-            position: absolute; bottom: 30px; left: 20px;
+            position: absolute; bottom: 90px; left: 20px;
             display: flex; flex-direction: column; gap: 8px; z-index: 300;
         }
         .zoom-btn {
@@ -221,40 +221,46 @@
         .record-details h4 { margin: 0 0 4px 0; font-size: 14px; color: var(--text-main); }
         .record-details span { font-size: 11px; color: var(--text-muted); }
 
-        /* استایل پنل اطلاعات */
+        /* ساختار یکپارچه Bottom Sheet برای پنل اطلاعات در تمامی پلتفرم‌ها */
         .hud-panel {
-            position: absolute; width: 280px;
-            background: var(--bg-card); backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass); padding: 14px;
-            border-radius: 14px; box-shadow: var(--shadow-elevated);
-            opacity: 0; transform: scale(0.9); transition: opacity 0.2s ease, transform 0.2s ease;
-            z-index: 400; pointer-events: none; display: none;
+            position: fixed;
+            bottom: -150px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glass);
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            box-shadow: var(--shadow-elevated);
+            z-index: 600;
+            opacity: 0;
+            transition: bottom 0.35s cubic-bezier(0.1, 1, 0.1, 1), opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
         }
-        .hud-panel.visible { opacity: 1; transform: scale(1); pointer-events: auto; display: block; }
-        .hud-panel h3 { margin: 0 0 4px 0; color: var(--accent-gold); font-size: 14px; }
-        .hud-panel p { margin: 0 0 8px 0; color: var(--text-main); font-size: 11px; line-height: 1.4; }
-        .hud-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 8px; }
-        .action-btn { background: var(--accent-gold); color: #020617; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 10px; cursor: pointer; }
+        .hud-panel.visible {
+            bottom: 0;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .hud-handle {
+            width: 40px; height: 4px; background: var(--text-muted);
+            border-radius: 2px; margin: 0 auto 12px auto; opacity: 0.4;
+        }
+        .hud-panel h3 { margin: 0 0 6px 0; color: var(--accent-gold); font-size: 16px; }
+        .hud-panel p { margin: 0 0 14px 0; color: var(--text-main); font-size: 13px; line-height: 1.5; }
+        .hud-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 10px; }
+        .action-btn { background: var(--accent-gold); color: #020617; border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .action-btn:hover { opacity: 0.9; transform: scale(1.05); }
 
-        /* تنظیمات مخصوص موبایل: باکس اطلاعات همیشه در پایین صفحه فیکس می‌شود */
         @media (max-width: 768px) {
             .gis-sidebar { width: 100%; right: -100%; left: auto; max-width: none; }
             html[dir="ltr"] .gis-sidebar { left: -100%; right: auto; }
             .gis-sidebar.open { right: 0; left: auto; }
-            
-            .hud-panel {
-                position: fixed !important;
-                left: 4% !important;
-                right: 4% !important;
-                width: 92% !important;
-                bottom: 25px !important;
-                top: auto !important;
-                transform: translateY(30px) !important;
-                transition: opacity 0.3s ease, transform 0.3s ease !important;
-            }
-            .hud-panel.visible {
-                transform: translateY(0) !important;
-            }
         }
     </style>
 </head>
@@ -303,15 +309,6 @@
                     
                     <div id="userLocationPin">📍</div>
 
-                    <div class="hud-panel" id="hudPanel">
-                        <h3 id="hudTitle">معلومات المكان</h3>
-                        <p id="hudDescription">التفاصيل...</p>
-                        <div class="hud-footer">
-                            <span style="font-size: 10px; color: var(--text-muted);" id="txtGuideLabel">إرشادات الزائر</span>
-                            <button class="action-btn" onclick="triggerAudio()" id="btnAudio">🔊 تشغيل الصوت</button>
-                        </div>
-                    </div>
-
                     <div class="hotspot" style="top: 83.5%; left: 57.5%;" data-id="1" data-key="gate_qibla">1</div>
                     <div class="hotspot" style="top: 76.5%; left: 77.5%;" data-id="2" data-key="gate_ridha">2</div>
                     <div class="hotspot" style="top: 71.0%; left: 81.0%;" data-id="3" data-key="gate_muslim">3</div>
@@ -342,6 +339,17 @@
                     <div class="sub-hotspot wc" style="top: 22.0%; left: 11.5%;" data-id="WC3" data-key="wc_3">🚻</div>
                     <div class="sub-hotspot wc" style="top: 22.5%; left: 38.5%;" data-id="WC4" data-key="wc_4">🚻</div>
                     <div class="sub-hotspot wc" style="top: 71.0%; left: 91.5%;" data-id="WC5" data-key="wc_5">🚻</div>
+                </div>
+            </div>
+
+            <!-- پنل اطلاعات کشویی از پایین (Bottom Sheet) -->
+            <div class="hud-panel" id="hudPanel">
+                <div class="hud-handle"></div>
+                <h3 id="hudTitle">معلومات المكان</h3>
+                <p id="hudDescription">التفاصيل...</p>
+                <div class="hud-footer">
+                    <span style="font-size: 11px; color: var(--text-muted);" id="txtGuideLabel">إرشادات الزائر</span>
+                    <button class="action-btn" onclick="triggerAudio()" id="btnAudio">🔊 تشغيل الصوت</button>
                 </div>
             </div>
 
@@ -509,8 +517,6 @@
             document.getElementById('txtBackHome').textContent = t.backHome;
             document.getElementById('sidebarTitle').textContent = t.title;
             document.getElementById('gisSearchInput').placeholder = t.searchPlaceholder;
-            document.getElementById('hudTitle').textContent = t.infoTitle;
-            document.getElementById('hudDescription').textContent = t.selectPrompt;
             document.getElementById('txtGuideLabel').textContent = t.guideLabel;
             document.getElementById('btnAudio').textContent = t.audioBtn;
 
@@ -786,9 +792,7 @@
             hudTitle.textContent = loc.title;
             hudDescription.textContent = loc.desc;
 
-            // فقط در دسکتاپ باکس کنار پین قرار می‌گیرد؛ در موبایل توسط CSS در پایین صفحه فیکس می‌شود
-            hudPanel.style.left = `calc(${loc.left}% + 15px)`;
-            hudPanel.style.top = `calc(${loc.top}% - 15px)`;
+            // نمایش کشویی پنل از پایین صفحه در تمامی پلتفرم‌ها
             hudPanel.classList.add('visible');
         }
 
