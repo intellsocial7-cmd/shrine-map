@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المنصة الذكية لعتبة المقدسة لمرقد الإمام علي (ع) | Pilgrim Guide Map 3D</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>المنصة الذكية لعتبة المقدسة لمرقد الإمام علي (ع) | Pilgrim Guide Map</title>
     <style>
         :root {
             --bg-base: #020617;
@@ -96,25 +95,27 @@
         .map-viewport {
             position: relative; width: 100%; height: 100%;
             cursor: grab; overflow: hidden; touch-action: none;
-            background: radial-gradient(ellipse at center, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0) 70%);
         }
         .map-viewport:active { cursor: grabbing; }
 
-        #threeCanvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: block; touch-action: none;
+        .map-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            transform-origin: 0 0;
+            will-change: transform;
+            width: 2400px;
+            height: 1600px;
         }
 
-        #markersLayer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
+        .map-canvas img {
+            display: block; width: 100%; height: 100%; pointer-events: none;
         }
 
         .hotspot {
             position: absolute; width: 38px; height: 38px;
             background: rgba(245, 158, 11, 0.92); border: 3px solid #fff;
             border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%);
-            transition: background 0.2s ease; z-index: 100; pointer-events: auto;
+            transition: transform 0.2s ease, background 0.2s ease; z-index: 100;
             display: flex; align-items: center; justify-content: center;
             font-size: 12px; font-weight: bold; color: #fff;
             box-shadow: 0 0 15px rgba(245, 158, 11, 0.7);
@@ -127,7 +128,7 @@
             background: rgba(59, 130, 246, 0.92); border: 2px solid #fff;
             border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%);
             display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: bold; color: #fff; z-index: 100; pointer-events: auto;
+            font-size: 10px; font-weight: bold; color: #fff; z-index: 100;
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
         }
         .sub-hotspot.wc { background: rgba(239, 68, 68, 0.92); }
@@ -140,7 +141,7 @@
             border-radius: 50%; transform: translate(-50%, -50%);
             display: none; align-items: center; justify-content: center;
             z-index: 200; box-shadow: 0 0 25px var(--accent-blue);
-            animation: pulsePin 1.8s infinite; pointer-events: none;
+            animation: pulsePin 1.8s infinite;
         }
         @keyframes pulsePin {
             0% { transform: translate(-50%, -50%) scale(1); }
@@ -163,20 +164,8 @@
         }
         .gis-btn:hover { background: var(--accent-gold); color: #020617; border-color: var(--accent-gold); }
         .gis-btn.active-lang { background: var(--accent-gold); color: #020617; }
-        .gis-btn.active-toggle { background: var(--accent-green); color: #020617; border-color: var(--accent-green); }
         .gps-btn { background: var(--accent-blue); color: #fff; border: none; }
         .back-home-btn { background: #ef4444; color: #fff; border: none; }
-
-        .drag-hint {
-            position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
-            background: var(--bg-card); backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glass); color: var(--text-main);
-            padding: 10px 18px; border-radius: 30px; font-size: 12px;
-            box-shadow: var(--shadow-elevated); z-index: 300; pointer-events: none;
-            opacity: 1; transition: opacity 0.6s ease; display: flex; align-items: center; gap: 8px;
-            white-space: nowrap;
-        }
-        .drag-hint.hidden { opacity: 0; }
 
         .gis-sidebar {
             position: absolute; top: 0; right: -440px; width: 420px; height: 100%;
@@ -232,30 +221,17 @@
         .hud-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 8px; }
         .action-btn { background: var(--accent-gold); color: #020617; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 10px; cursor: pointer; }
 
-        #loadingIndicator {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 250; color: var(--text-muted); font-size: 13px; display: flex;
-            flex-direction: column; align-items: center; gap: 10px; pointer-events: none;
-        }
-        .spinner {
-            width: 34px; height: 34px; border-radius: 50%;
-            border: 3px solid var(--border-glass); border-top-color: var(--accent-gold);
-            animation: spin 0.9s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
         @media (max-width: 768px) {
             .gis-sidebar { width: 100%; right: -100%; left: auto; max-width: none; }
             html[dir="ltr"] .gis-sidebar { left: -100%; right: auto; }
             .gis-sidebar.open { right: 0; left: auto; }
             .hud-panel { width: 240px; }
-            .drag-hint { font-size: 10.5px; padding: 8px 14px; text-align: center; max-width: 88%; white-space: normal; }
         }
     </style>
 </head>
 <body>
 
-    <!-- صفحه اسپلش -->
+    <!-- صفحه اسپلش[cite: 2] -->
     <div id="splashScreen">
         <div class="splash-container">
             <div class="logo-box">
@@ -273,8 +249,8 @@
                     <line x1="60" y1="12" x2="60" y2="15" stroke="#ffd700" stroke-width="1.5"/>
                 </svg>
             </div>
-
-            <h1>دليل خريطة الزائر ثلاثي الأبعاد</h1>
+            
+            <h1>دليل خريطة الزائر</h1>
             <p class="subtitle">
                 الرجاء اختيار اللغة المفضلة لديك<br>
                 Please select your preferred language<br>
@@ -291,19 +267,13 @@
         </div>
     </div>
 
-    <!-- نقشه GIS سه‌بعدی -->
+    <!-- نقشه GIS اصلی[cite: 1] -->
     <div id="gisAppContainer">
         <div class="gis-platform-container">
             <div class="map-viewport" id="mapViewport">
-
-                <canvas id="threeCanvas"></canvas>
-
-                <div id="loadingIndicator">
-                    <div class="spinner"></div>
-                    <span id="loadingText">در حال بارگذاری مدل سه‌بعدی...</span>
-                </div>
-
-                <div id="markersLayer">
+                <div class="map-canvas" id="mapCanvas">
+                    <img src="map2.jpg" id="mainMapImg" alt="خريطة الروضة المقدسة">
+                    
                     <div id="userLocationPin">📍</div>
 
                     <div class="hud-panel" id="hudPanel">
@@ -315,39 +285,37 @@
                         </div>
                     </div>
 
-                    <div class="hotspot" data-id="1" data-key="gate_qibla">1</div>
-                    <div class="hotspot" data-id="2" data-key="gate_ridha">2</div>
-                    <div class="hotspot" data-id="3" data-key="gate_muslim">3</div>
-                    <div class="hotspot" data-id="4" data-key="gate_tusi">4</div>
-                    <div class="hotspot" data-id="5" data-key="gate_hasan">5</div>
-                    <div class="hotspot" data-id="6" data-key="gate_hussein">6</div>
-                    <div class="hotspot" data-id="7" data-key="gate_faraj">7</div>
-                    <div class="hotspot" data-id="8" data-key="gate_khatam">8</div>
-                    <div class="hotspot" data-id="9" data-key="gate_awsiya">9</div>
-                    <div class="hotspot" data-id="10" data-key="gate_zahra">10</div>
-                    <div class="hotspot" data-id="11" data-key="shrine_imran">11</div>
-                    <div class="hotspot" data-id="12" data-key="shrine_gharawiya">12</div>
-                    <div class="hotspot" data-id="13" data-key="service_bridge">13</div>
-                    <div class="hotspot" data-id="14" data-key="service_admin">14</div>
-                    <div class="hotspot" data-id="15" data-key="shrine_library">15</div>
-                    <div class="hotspot" data-id="16" data-key="service_guesthouse">16</div>
-                    <div class="hotspot" data-id="17" data-key="shrine_museum">17</div>
-                    <div class="hotspot" data-id="18" data-key="service_pilgrim">18</div>
-                    <div class="hotspot" data-id="19" data-key="entry_abozar">19</div>
-                    <div class="hotspot" data-id="20" data-key="entry_miqdad">20</div>
-                    <div class="hotspot" data-id="21" data-key="entry_salman">21</div>
-                    <div class="hotspot" data-id="22" data-key="entry_ammar">22</div>
+                    <div class="hotspot" style="top: 83.5%; left: 57.5%;" data-id="1" data-key="gate_qibla">1</div>
+                    <div class="hotspot" style="top: 76.5%; left: 77.5%;" data-id="2" data-key="gate_ridha">2</div>
+                    <div class="hotspot" style="top: 71.0%; left: 81.0%;" data-id="3" data-key="gate_muslim">3</div>
+                    <div class="hotspot" style="top: 61.5%; left: 74.0%;" data-id="4" data-key="gate_tusi">4</div>
+                    <div class="hotspot" style="top: 79.5%; left: 41.5%;" data-id="5" data-key="gate_hasan">5</div>
+                    <div class="hotspot" style="top: 48.0%; left: 66.0%;" data-id="6" data-key="gate_hussein">6</div>
+                    <div class="hotspot" style="top: 72.0%; left: 60.5%;" data-id="7" data-key="gate_faraj">7</div>
+                    <div class="hotspot" style="top: 55.5%; left: 29.0%;" data-id="8" data-key="gate_khatam">8</div>
+                    <div class="hotspot" style="top: 51.5%; left: 42.5%;" data-id="9" data-key="gate_awsiya">9</div>
+                    <div class="hotspot" style="top: 31.0%; left: 16.5%;" data-id="10" data-key="gate_zahra">10</div>
+                    <div class="hotspot" style="top: 59.5%; left: 63.5%;" data-id="11" data-key="shrine_imran">11</div>
+                    <div class="hotspot" style="top: 38.0%; left: 53.0%;" data-id="12" data-key="shrine_gharawiya">12</div>
+                    <div class="hotspot" style="top: 53.5%; left: 37.0%;" data-id="13" data-key="service_bridge">13</div>
+                    <div class="hotspot" style="top: 42.0%; left: 21.5%;" data-id="14" data-key="service_admin">14</div>
+                    <div class="hotspot" style="top: 51.0%; left: 26.5%;" data-id="15" data-key="shrine_library">15</div>
+                    <div class="hotspot" style="top: 33.5%; left: 31.5%;" data-id="16" data-key="service_guesthouse">16</div>
+                    <div class="hotspot" style="top: 38.0%; left: 35.5%;" data-id="17" data-key="shrine_museum">17</div>
+                    <div class="hotspot" style="top: 39.5%; left: 25.0%;" data-id="18" data-key="service_pilgrim">18</div>
+                    <div class="hotspot" style="top: 81.0%; left: 39.0%;" data-id="19" data-key="entry_abozar">19</div>
+                    <div class="hotspot" style="top: 77.0%; left: 41.5%;" data-id="20" data-key="entry_miqdad">20</div>
+                    <div class="hotspot" style="top: 51.5%; left: 63.0%;" data-id="21" data-key="entry_salman">21</div>
+                    <div class="hotspot" style="top: 51.5%; left: 59.5%;" data-id="22" data-key="entry_ammar">22</div>
 
-                    <div class="sub-hotspot" data-id="S1" data-key="sub_rest">💤</div>
-                    <div class="sub-hotspot" data-id="S2" data-key="sub_lost">🎒</div>
-                    <div class="sub-hotspot" data-id="S3" data-key="sub_parking">🅿️</div>
-                    <div class="sub-hotspot wc" data-id="WC1" data-key="wc_1">🚻</div>
-                    <div class="sub-hotspot wc" data-id="WC3" data-key="wc_3">🚻</div>
-                    <div class="sub-hotspot wc" data-id="WC4" data-key="wc_4">🚻</div>
-                    <div class="sub-hotspot wc" data-id="WC5" data-key="wc_5">🚻</div>
+                    <div class="sub-hotspot" style="top: 81.5%; left: 29.5%;" data-id="S1" data-key="sub_rest">💤</div>
+                    <div class="sub-hotspot" style="top: 92.5%; left: 41.5%;" data-id="S2" data-key="sub_lost">🎒</div>
+                    <div class="sub-hotspot" style="top: 24.5%; left: 91.5%;" data-id="S3" data-key="sub_parking">🅿️</div>
+                    <div class="sub-hotspot wc" style="top: 76.5%; left: 9.5%;" data-id="WC1" data-key="wc_1">🚻</div>
+                    <div class="sub-hotspot wc" style="top: 22.0%; left: 11.5%;" data-id="WC3" data-key="wc_3">🚻</div>
+                    <div class="sub-hotspot wc" style="top: 22.5%; left: 38.5%;" data-id="WC4" data-key="wc_4">🚻</div>
+                    <div class="sub-hotspot wc" style="top: 71.0%; left: 91.5%;" data-id="WC5" data-key="wc_5">🚻</div>
                 </div>
-
-                <div class="drag-hint" id="dragHint">🖐️ <span id="dragHintText">اسحب لتدوير النموذج، مرر للتكبير</span></div>
             </div>
 
             <div class="gis-topbar">
@@ -356,8 +324,6 @@
                     <button class="gis-btn gps-btn" onclick="locateUser()" id="btnGps">📍 موقعي</button>
                     <button class="gis-btn" onclick="toggleSidebar()"><span id="txtMenuIcon">☰</span> <span id="txtMenuList">قائمة الأماكن</span></button>
                     <button class="gis-btn" onclick="toggleAppTheme()" id="themeToggleBtn">🌙 الوضع الليلي</button>
-                    <button class="gis-btn" onclick="toggleAutoRotate()" id="autoRotateBtn">🔄 دوران تلقائي</button>
-                    <button class="gis-btn" onclick="resetView()" id="resetViewBtn">🎯 إعادة الزاوية</button>
                 </div>
                 <div class="toolbar-group">
                     <button class="gis-btn" onclick="changeLang('ar')" id="langAr">العربیة</button>
@@ -383,7 +349,6 @@
         const translations = {
             ar: {
                 title: "قائمة أماكن وخدمات الروضة", searchPlaceholder: "بحث عن مكان، استراحة، دورات مياه...", myLocation: "📍 موقعي", menuList: "قائمة الأماكن", darkMode: "🌙 الوضع الليلي", lightMode: "☀️ الوضع النهاري", guideLabel: "إرشادات الزائر", audioBtn: "🔊 تشغيل الصوت", infoTitle: "معلومات المكان", selectPrompt: "انقر على النقاط لعرض التفاصيل.", backHome: "الرئيسية",
-                autoRotateOn: "⏸ إيقاف الدوران", autoRotateOff: "🔄 دوران تلقائي", resetView: "🎯 إعادة الزاوية", dragHint: "🖐️ اسحب لتدوير النموذج، مرر للتكبير", loadingText: "جارٍ تحميل النموذج ثلاثي الأبعاد...",
                 locs: {
                     gate_qibla: { title: "١. باب القبلة", desc: "المدخل الرئيسي والجنوبي للروضة المقدسة.", top: 83.5, left: 57.5 },
                     gate_ridha: { title: "٢. باب الإمام الرضا (ع)", desc: "مدخل السيدات المخصص في الجانب الشرقي.", top: 76.5, left: 77.5 },
@@ -418,7 +383,6 @@
             },
             fa: {
                 title: "فهرست اماکن و خدمات حرم", searchPlaceholder: "جستجوی مکان، استراحتگاه، سرویس...", myLocation: "📍 موقعیت من", menuList: "فهرست اماکن", darkMode: "🌙 حالت شب", lightMode: "☀️ حالت روز", guideLabel: "راهنمای زائر", audioBtn: "🔊 پخش صوت", infoTitle: "اطلاعات مکان", selectPrompt: "برای مشاهده اطلاعات روی پین‌ها کلیک کنید.", backHome: "بازگشت",
-                autoRotateOn: "⏸ توقف چرخش", autoRotateOff: "🔄 چرخش خودکار", resetView: "🎯 بازنشانی زاویه دید", dragHint: "🖐️ برای چرخاندن مدل بکشید، برای بزرگ‌نمایی اسکرول کنید", loadingText: "در حال بارگذاری مدل سه‌بعدی...",
                 locs: {
                     gate_qibla: { title: "۱. باب القبله", desc: "ورودی اصلی و جنوبی حرم مطهر.", top: 83.5, left: 57.5 },
                     gate_ridha: { title: "۲. باب الإمام الرضا (ع)", desc: "ورودی اختصاصی بانوان در ضلع شرقی.", top: 76.5, left: 77.5 },
@@ -453,7 +417,6 @@
             },
             en: {
                 title: "Shrine Places & Services", searchPlaceholder: "Search location, rest area, restroom...", myLocation: "📍 My Location", menuList: "Locations", darkMode: "🌙 Dark Mode", lightMode: "☀️ Light Mode", guideLabel: "Visitor Guide", audioBtn: "🔊 Play Audio", infoTitle: "Location Info", selectPrompt: "Click on pins to view details.", backHome: "Home",
-                autoRotateOn: "⏸ Stop Rotation", autoRotateOff: "🔄 Auto Rotate", resetView: "🎯 Reset View", dragHint: "🖐️ Drag to rotate the model, scroll to zoom", loadingText: "Loading the 3D model...",
                 locs: {
                     gate_qibla: { title: "1. Al-Qibla Gate", desc: "Primary southern entrance.", top: 83.5, left: 57.5 },
                     gate_ridha: { title: "2. Imam Al-Rida Gate", desc: "Women entrance.", top: 76.5, left: 77.5 },
@@ -494,7 +457,7 @@
             document.getElementById('splashScreen').style.display = 'none';
             document.getElementById('gisAppContainer').style.display = 'block';
             changeLang(lang);
-            requestAnimationFrame(() => { initThree(); onResize(); });
+            requestAnimationFrame(initView);
         }
 
         function goToSplash() {
@@ -505,7 +468,7 @@
         function changeLang(lang) {
             currentLang = lang;
             const t = translations[lang];
-
+            
             document.documentElement.setAttribute('dir', lang === 'en' ? 'ltr' : 'rtl');
             document.documentElement.setAttribute('lang', lang);
 
@@ -518,10 +481,6 @@
             document.getElementById('hudDescription').textContent = t.selectPrompt;
             document.getElementById('txtGuideLabel').textContent = t.guideLabel;
             document.getElementById('btnAudio').textContent = t.audioBtn;
-            document.getElementById('resetViewBtn').textContent = t.resetView;
-            document.getElementById('autoRotateBtn').textContent = autoRotate ? t.autoRotateOn : t.autoRotateOff;
-            document.getElementById('dragHintText').parentElement.innerHTML = t.dragHint;
-            document.getElementById('loadingText').textContent = t.loadingText;
 
             document.querySelectorAll('.toolbar-group .gis-btn[id^="lang"]').forEach(b => b.classList.remove('active-lang'));
             const langBtn = document.getElementById('lang' + lang.charAt(0).toUpperCase() + lang.slice(1));
@@ -530,14 +489,8 @@
             renderRecords(database);
         }
 
-        // ---------------------------------------------------------------
-        // تنظیمات Three.js با ساختار ماکت مینیاتوری صیقلی و استاندارد
-        // ---------------------------------------------------------------
         const viewport = document.getElementById('mapViewport');
-        const canvasEl = document.getElementById('threeCanvas');
-        const markersLayer = document.getElementById('markersLayer');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const dragHint = document.getElementById('dragHint');
+        const canvas = document.getElementById('mapCanvas');
         const allHotspots = document.querySelectorAll('.hotspot, .sub-hotspot');
         const userPin = document.getElementById('userLocationPin');
         const hudPanel = document.getElementById('hudPanel');
@@ -548,254 +501,111 @@
         const gisSidebar = document.getElementById('gisSidebar');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-        const PLATE_W = 30;
-        const PLATE_D = PLATE_W * (1839 / 2600);
-        const PLATE_H = 1.2;
+        let scale = 1, posX = 0, posY = 0, isPanning = false, startX, startY;
+        let activeItem = null;
+        let activeKey = "";
 
-        let scene, camera, renderer;
-        let theta = degToRad(38), phi = degToRad(50);
-        let radius = Math.max(PLATE_W, PLATE_D) * 1.55;
-        const DEFAULT_THETA = theta, DEFAULT_PHI = phi, DEFAULT_RADIUS = radius;
-        let cameraTarget = null;
-        const MIN_RADIUS = Math.max(PLATE_W, PLATE_D) * 0.32;
-        const MAX_RADIUS = Math.max(PLATE_W, PLATE_D) * 2.6;
-        const MIN_PHI = degToRad(10), MAX_PHI = degToRad(86);
-
-        let autoRotate = false;
-        let activePointers = new Map();
-        let isDragging = false, dragMoved = false, lastX = 0, lastY = 0, prevPinchDist = null;
-        let threeReady = false;
-        let cameraTween = null;
-
-        function degToRad(d) { return d * Math.PI / 180; }
-
-        function initThree() {
-            if (threeReady) return;
-            threeReady = true;
-
-            cameraTarget = new THREE.Vector3(0, PLATE_H / 2, 0);
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(42, 1, 0.1, 600);
-            renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-            // نورپردازی استودیویی با کنتراست مطلوب
-            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-            const dirLight = new THREE.DirectionalLight(0xfffaed, 0.9);
-            dirLight.position.set(15, 25, 20);
-            scene.add(dirLight);
-
-            const dirLight2 = new THREE.DirectionalLight(0x3b82f6, 0.3);
-            dirLight2.position.set(-15, 15, -15);
-            scene.add(dirLight2);
-
-            // پایه مکعبی شیک با لبه‌های طلایی
-            const baseGeo = new THREE.BoxGeometry(PLATE_W, PLATE_H, PLATE_D);
-            const baseMat = new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.6, metalness: 0.25 });
-            const baseMesh = new THREE.Mesh(baseGeo, baseMat);
-            scene.add(baseMesh);
-
-            // نقشه دو‌بعدی باکیفیت و تخت با وضوح بالا بدون به‌هم‌ریختگی هندسی
-            const loader = new THREE.TextureLoader();
-            loader.load('map2.jpg', function (tex) {
-                if ('sRGBEncoding' in THREE) tex.encoding = THREE.sRGBEncoding;
-                tex.minFilter = THREE.LinearFilter;
-                tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-
-                const planeGeo = new THREE.PlaneGeometry(PLATE_W, PLATE_D);
-                const planeMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.5 });
-                const planeMesh = new THREE.Mesh(planeGeo, planeMat);
-                planeMesh.rotation.x = -Math.PI / 2;
-                planeMesh.position.y = PLATE_H / 2 + 0.015;
-                scene.add(planeMesh);
-
-                loadingIndicator.style.display = 'none';
-            }, undefined, function () {
-                loadingIndicator.style.display = 'none';
-            });
-
-            attachControlEvents();
-            animate();
+        function updateTransform() {
+            canvas.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
         }
 
-        function onResize() {
-            if (!threeReady) return;
-            const w = viewport.clientWidth, h = viewport.clientHeight;
-            if (w === 0 || h === 0) return;
-            renderer.setSize(w, h, false);
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-        }
-        window.addEventListener('resize', onResize);
-
-        function updateCameraFromSpherical() {
-            camera.position.x = cameraTarget.x + radius * Math.sin(phi) * Math.sin(theta);
-            camera.position.y = cameraTarget.y + radius * Math.cos(phi);
-            camera.position.z = cameraTarget.z + radius * Math.sin(phi) * Math.cos(theta);
-            camera.lookAt(cameraTarget);
-        }
-
-        function worldPosForPct(leftPct, topPct) {
-            const x = -PLATE_W / 2 + (leftPct / 100) * PLATE_W;
-            const z = -PLATE_D / 2 + (topPct / 100) * PLATE_D;
-            const y = PLATE_H / 2 + 0.35;
-            return new THREE.Vector3(x, y, z);
+        function initView() {
+            const vW = viewport.clientWidth;
+            const vH = viewport.clientHeight;
+            if(vW === 0 || vH === 0) return;
+            
+            scale = Math.max(vW / 2400, vH / 1600);
+            
+            const targetX = 1200;
+            const targetY = 800;
+            
+            posX = (vW / 2) - (targetX * scale);
+            posY = (vH / 2) - (targetY * scale);
+            
+            updateTransform();
         }
 
-        function projectToScreen(worldVec) {
-            const v = worldVec.clone().project(camera);
-            const w = viewport.clientWidth, h = viewport.clientHeight;
-            return { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, behind: v.z > 1 };
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            if (cameraTween) applyCameraTween();
-            if (autoRotate && !isDragging && activePointers.size === 0) theta += 0.0022;
-
-            updateCameraFromSpherical();
-            renderer.render(scene, camera);
-            updateMarkerPositions();
-        }
-
-        function updateMarkerPositions() {
-            const w = viewport.clientWidth, h = viewport.clientHeight;
-            if (w === 0 || h === 0) return;
-
-            database.forEach(item => {
-                const pos = worldPosForPct(item.left, item.top);
-                const scr = projectToScreen(pos);
-                item.element.style.left = scr.x + 'px';
-                item.element.style.top = scr.y + 'px';
-                item.element.style.visibility = scr.behind ? 'hidden' : 'visible';
-            });
-
-            if (userPin.style.display !== 'none' && userPin.dataset.left) {
-                const pos = worldPosForPct(parseFloat(userPin.dataset.left), parseFloat(userPin.dataset.top));
-                const scr = projectToScreen(pos);
-                userPin.style.left = scr.x + 'px';
-                userPin.style.top = scr.y + 'px';
-            }
-
-            if (activeItem) {
-                const pos = worldPosForPct(activeItem.left, activeItem.top);
-                const scr = projectToScreen(pos);
-                hudPanel.style.left = Math.min(scr.x + 18, w - 296) + 'px';
-                hudPanel.style.top = Math.max(Math.min(scr.y - 10, h - 160), 10) + 'px';
-            }
-        }
-
-        function attachControlEvents() {
-            const dismissHint = () => { dragHint.classList.add('hidden'); };
-            setTimeout(dismissHint, 4500);
-
-            viewport.addEventListener('pointerdown', (e) => {
-                dismissHint();
-                cameraTween = null;
-                activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-                if (activePointers.size === 1) {
-                    isDragging = true; dragMoved = false;
-                    lastX = e.clientX; lastY = e.clientY;
-                } else if (activePointers.size === 2) {
-                    isDragging = false;
-                    prevPinchDist = getPinchDist();
-                }
-            });
-
-            window.addEventListener('pointermove', (e) => {
-                if (!activePointers.has(e.pointerId)) return;
-                activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-                if (activePointers.size === 2) {
-                    const d = getPinchDist();
-                    if (prevPinchDist && d) {
-                        radius = clamp(radius * (prevPinchDist / d), MIN_RADIUS, MAX_RADIUS);
-                    }
-                    prevPinchDist = d;
-                } else if (activePointers.size === 1 && isDragging) {
-                    const dx = e.clientX - lastX, dy = e.clientY - lastY;
-                    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
-                    if (dragMoved) {
-                        theta -= dx * 0.006;
-                        phi = clamp(phi - dy * 0.006, MIN_PHI, MAX_PHI);
-                    }
-                    lastX = e.clientX; lastY = e.clientY;
-                }
-            });
-
-            function endPointer(e) {
-                activePointers.delete(e.pointerId);
-                if (activePointers.size < 2) prevPinchDist = null;
-                if (activePointers.size === 0) isDragging = false;
-            }
-            window.addEventListener('pointerup', endPointer);
-            window.addEventListener('pointercancel', endPointer);
-
-            viewport.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                dismissHint();
-                cameraTween = null;
-                const factor = e.deltaY > 0 ? 1.08 : 0.92;
-                radius = clamp(radius * factor, MIN_RADIUS, MAX_RADIUS);
-            }, { passive: false });
-
-            viewport.addEventListener('click', (e) => {
-                if (dragMoved) return;
-                if (e.target === viewport || e.target === canvasEl || e.target === markersLayer) closeHud();
-            });
-        }
-
-        function getPinchDist() {
-            const pts = [...activePointers.values()];
-            if (pts.length < 2) return null;
-            return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-        }
-
-        function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
-        function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-
-        function tweenCameraTo(endTheta, endPhi, endRadius, endTargetVec, duration) {
-            cameraTween = {
-                startTheta: theta, startPhi: phi, startRadius: radius,
-                startTarget: cameraTarget.clone(),
-                endTheta, endPhi, endRadius, endTarget: endTargetVec.clone(),
-                startTime: performance.now(), duration: duration || 650
-            };
-        }
-
-        function applyCameraTween() {
-            const ct = cameraTween;
-            const t = clamp((performance.now() - ct.startTime) / ct.duration, 0, 1);
-            const e = easeOutCubic(t);
-            theta = ct.startTheta + (ct.endTheta - ct.startTheta) * e;
-            phi = ct.startPhi + (ct.endPhi - ct.startPhi) * e;
-            radius = ct.startRadius + (ct.endRadius - ct.startRadius) * e;
-            cameraTarget.lerpVectors(ct.startTarget, ct.endTarget, e);
-            if (t >= 1) cameraTween = null;
-        }
-
+        // تابع انیمیشن نرم برای جابجایی نقشه به سمت مختصات دلخواه (پین یا آیتم منو)
         function smoothPanTo(targetLeftPct, targetTopPct) {
-            if (!threeReady) return;
-            const pos = worldPosForPct(targetLeftPct, targetTopPct);
-            const endTarget = new THREE.Vector3(pos.x, PLATE_H / 2, pos.z);
-            const focusRadius = clamp(Math.max(PLATE_W, PLATE_D) * 0.55, MIN_RADIUS, radius);
-            tweenCameraTo(theta, phi, focusRadius, endTarget, 700);
+            const vW = viewport.clientWidth;
+            const vH = viewport.clientHeight;
+            if(vW === 0 || vH === 0) return;
+
+            // در صورتی که زوم کم بود، روی مکان مورد نظر زوم مناسب هم بکنیم (مثلاً مقیاس 1.2 یا حفظ مقیاس فعلی)
+            if (scale < 1.0) scale = 1.2;
+
+            const targetPixelX = (targetLeftPct / 100) * 2400;
+            const targetPixelY = (targetTopPct / 100) * 1600;
+
+            const finalX = (vW / 2) - (targetPixelX * scale);
+            const finalY = (vH / 2) - (targetPixelY * scale);
+
+            // انیمیشن نرم با استفاده از فریم‌رید
+            const startX = posX;
+            const startY = posY;
+            const startTime = performance.now();
+            const duration = 500; // مدت زمان انیمیشن به میلی‌ثانیه
+
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // تابع تسهیل (Ease Out)
+                const ease = 1 - Math.pow(1 - progress, 3);
+
+                posX = startX + (finalX - startX) * ease;
+                posY = startY + (finalY - startY) * ease;
+                updateTransform();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            requestAnimationFrame(animate);
         }
 
-        function resetView() {
-            if (!threeReady) return;
-            tweenCameraTo(DEFAULT_THETA, DEFAULT_PHI, DEFAULT_RADIUS, new THREE.Vector3(0, PLATE_H / 2, 0), 700);
-        }
+        window.addEventListener('resize', initView);
 
-        function toggleAutoRotate() {
-            autoRotate = !autoRotate;
-            const t = translations[currentLang];
-            const btn = document.getElementById('autoRotateBtn');
-            btn.textContent = autoRotate ? t.autoRotateOn : t.autoRotateOff;
-            btn.classList.toggle('active-toggle', autoRotate);
-        }
+        viewport.addEventListener('mousedown', (e) => {
+            isPanning = true; 
+            startX = e.clientX - posX; 
+            startY = e.clientY - posY;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            posX = e.clientX - startX; 
+            posY = e.clientY - startY;
+            updateTransform();
+        });
+        window.addEventListener('mouseup', () => { isPanning = false; });
+
+        viewport.addEventListener('touchstart', (e) => {
+            if(e.touches.length === 1) {
+                isPanning = true;
+                startX = e.touches[0].clientX - posX;
+                startY = e.touches[0].clientY - posY;
+            }
+        }, {passive: true});
+        viewport.addEventListener('touchmove', (e) => {
+            if (!isPanning || e.touches.length !== 1) return;
+            posX = e.touches[0].clientX - startX;
+            posY = e.touches[0].clientY - startY;
+            updateTransform();
+        }, {passive: true});
+        viewport.addEventListener('touchend', () => { isPanning = false; });
+
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomRate = 0.12, prevScale = scale;
+            if (e.deltaY < 0) scale *= (1 + zoomRate);
+            else scale /= (1 + zoomRate);
+            scale = Math.min(Math.max(scale, 0.3), 5.0);
+            
+            const rect = viewport.getBoundingClientRect();
+            const mX = e.clientX - rect.left, mY = e.clientY - rect.top;
+            posX = mX - (mX - posX) * (scale / prevScale);
+            posY = mY - (mY - posY) * (scale / prevScale);
+            updateTransform();
+        }, { passive: false });
 
         function locateUser() {
             showUserPin(57.5, 83.5);
@@ -803,10 +613,16 @@
         }
 
         function showUserPin(leftPct, topPct) {
-            userPin.dataset.left = leftPct;
-            userPin.dataset.top = topPct;
+            userPin.style.left = `${leftPct}%`;
+            userPin.style.top = `${topPct}%`;
             userPin.style.display = 'flex';
         }
+
+        viewport.addEventListener('click', (e) => {
+            if(e.target === viewport || e.target.tagName === 'IMG') {
+                closeHud();
+            }
+        });
 
         function closeHud() {
             allHotspots.forEach(s => s.classList.remove('active'));
@@ -820,7 +636,7 @@
         }
 
         function toggleAppTheme() {
-            if (document.documentElement.getAttribute('data-theme') === 'light') {
+            if(document.documentElement.getAttribute('data-theme') === 'light') {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 themeToggleBtn.textContent = translations[currentLang].darkMode;
             } else {
@@ -839,19 +655,19 @@
             }
         }
 
-        let activeItem = null;
-        let activeKey = "";
-
         const database = [];
         allHotspots.forEach(spot => {
             const key = spot.getAttribute('data-key');
             const loc = translations.ar.locs[key];
             if (loc) {
+                // استخراج مختصات درصدی از استایل پین‌ها
+                const topVal = parseFloat(spot.style.top);
+                const leftVal = parseFloat(spot.style.left);
                 database.push({
                     id: spot.getAttribute('data-id'),
                     key: key,
-                    top: loc.top,
-                    left: loc.left,
+                    top: topVal,
+                    left: leftVal,
                     element: spot
                 });
             }
@@ -862,10 +678,10 @@
             const t = translations[currentLang];
             arr.forEach(item => {
                 const loc = t.locs[item.key];
-                if (!loc) return;
+                if(!loc) return;
                 const card = document.createElement('div');
                 card.className = 'record-card';
-
+                
                 card.innerHTML = `
                     <div class="record-badge">${item.id}</div>
                     <div class="record-details">
@@ -875,7 +691,7 @@
                 `;
                 card.addEventListener('click', () => {
                     showLocationInfo(item);
-                    smoothPanTo(item.left, item.top);
+                    smoothPanTo(item.left, item.top); // حرکت نرم روی نقشه به سمت مکان انتخابی منو
                     toggleSidebar();
                 });
                 gisRecordsList.appendChild(card);
@@ -893,18 +709,20 @@
 
             hudTitle.textContent = loc.title;
             hudDescription.textContent = loc.desc;
+
+            hudPanel.style.left = `calc(${loc.left}% + 15px)`;
+            hudPanel.style.top = `calc(${loc.top}% - 15px)`;
             hudPanel.classList.add('visible');
         }
 
         allHotspots.forEach(spot => {
             spot.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (dragMoved) return;
                 const id = spot.getAttribute('data-id');
                 const item = database.find(l => l.id === id);
-                if (item) {
+                if(item) {
                     showLocationInfo(item);
-                    smoothPanTo(item.left, item.top);
+                    smoothPanTo(item.left, item.top); // حرکت نرم روی نقشه هنگام کلیک روی پین‌ها
                 }
             });
         });
