@@ -531,7 +531,7 @@
         }
 
         // ---------------------------------------------------------------
-        // تنظیمات Three.js با ماکت مکعبی برجسته و نورپردازی حرفه‌ای
+        // طراحی سه‌بعدی پیشرفته (مدل‌سازی احجام حرم، گنبد، مناره‌ها و رواق‌ها)
         // ---------------------------------------------------------------
         const viewport = document.getElementById('mapViewport');
         const canvasEl = document.getElementById('threeCanvas');
@@ -550,7 +550,7 @@
 
         const PLATE_W = 30;
         const PLATE_D = PLATE_W * (1839 / 2600);
-        const PLATE_H = 1.3; // ارتفاع ماکت سه‌بعدی بلوکی
+        const PLATE_H = 1.2;
 
         let scene, camera, renderer;
         let theta = degToRad(38), phi = degToRad(50);
@@ -580,23 +580,23 @@
             renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-            // نورپردازی پیشرفته با سایه‌روشن استاندارد برای القای عمق فیزیکی
-            scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-            const dirLight = new THREE.DirectionalLight(0xfffaed, 0.85);
-            dirLight.position.set(15, 25, 20);
+            // نورپردازی پویای صحنه برای برجسته شدن احجام سه‌بعدی
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const dirLight = new THREE.DirectionalLight(0xfffaed, 0.9);
+            dirLight.position.set(15, 30, 20);
             scene.add(dirLight);
 
-            const dirLight2 = new THREE.DirectionalLight(0x3b82f6, 0.35);
-            dirLight2.position.set(-15, 15, -15);
+            const dirLight2 = new THREE.DirectionalLight(0x3b82f6, 0.4);
+            dirLight2.position.set(-15, 20, -20);
             scene.add(dirLight2);
 
-            // بلوک مکعبی پایه ماکت با متریال بافت‌دار زیبا
+            // ۱. بلوک پایه ماکت نقشه
             const baseGeo = new THREE.BoxGeometry(PLATE_W, PLATE_H, PLATE_D);
             const baseMat = new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.7, metalness: 0.2 });
             const baseMesh = new THREE.Mesh(baseGeo, baseMat);
             scene.add(baseMesh);
 
-            // لایه اصلی نقشه (صاف، باکیفیت و بدون نقص) روی سطح بالایی ماکت
+            // ۲. تکسچر صفحه نقشه روی بیس
             const loader = new THREE.TextureLoader();
             loader.load('map2.jpg', function (tex) {
                 if ('sRGBEncoding' in THREE) tex.encoding = THREE.sRGBEncoding;
@@ -604,15 +604,14 @@
                 tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
                 const planeGeo = new THREE.PlaneGeometry(PLATE_W, PLATE_D);
-                const planeMat = new THREE.MeshStandardMaterial({ 
-                    map: tex, 
-                    roughness: 0.6,
-                    metalness: 0.05
-                });
+                const planeMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.7 });
                 const planeMesh = new THREE.Mesh(planeGeo, planeMat);
                 planeMesh.rotation.x = -Math.PI / 2;
                 planeMesh.position.y = PLATE_H / 2 + 0.015;
                 scene.add(planeMesh);
+
+                // ۳. مدل‌سازی هندسی سه‌بعدی (گنبد، مناره‌ها و رواق‌ها)
+                build3DArchitecture();
 
                 loadingIndicator.style.display = 'none';
             }, undefined, function () {
@@ -621,6 +620,48 @@
 
             attachControlEvents();
             animate();
+        }
+
+        // تابع ساخت احجام سه‌بعدی گنبد، مناره و رواق‌ها روی نقشه
+        function build3DArchitecture() {
+            const archGroup = new THREE.Group();
+            
+            // متریال طلایی برای گنبد و مناره‌ها
+            const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.3, metalness: 0.8 });
+            // متریال بژ/سنگی برای بدنه رواق‌ها و ساختمان حرم
+            const shrineMat = new THREE.MeshStandardMaterial({ color: 0xe6ccb2, roughness: 0.8 });
+
+            // الف) ساخت گنبد مطهر (نیم‌کره طلایی)
+            const domeGeo = new THREE.SphereGeometry(0.7, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+            const domeMesh = new THREE.Mesh(domeGeo, goldMat);
+            domeMesh.position.set(2.2, PLATE_H / 2 + 0.5, 0.5);
+            archGroup.add(domeMesh);
+
+            // ب) ساخت مناره‌های حرم (استوانه‌های بلند طلایی در اطراف بقعه)
+            const minaretGeo = new THREE.CylinderGeometry(0.12, 0.15, 2.2, 12);
+            const minaretCoords = [
+                { x: 1.2, z: -0.8 }, { x: 3.2, z: -0.8 },
+                { x: 1.2, z: 1.8 },  { x: 3.2, z: 1.8 }
+            ];
+            minaretCoords.forEach(pos => {
+                const minaret = new THREE.Mesh(minaretGeo, goldMat);
+                minaret.position.set(pos.x, PLATE_H / 2 + 1.1, pos.z);
+                archGroup.add(minaret);
+            });
+
+            // ج) ساخت بلوک سه‌بعدی رواق‌ها و صحن اصلی
+            const shrineCoreGeo = new THREE.BoxGeometry(3.5, 0.4, 3.0);
+            const shrineCore = new THREE.Mesh(shrineCoreGeo, shrineMat);
+            shrineCore.position.set(2.2, PLATE_H / 2 + 0.2, 0.5);
+            archGroup.add(shrineCore);
+
+            // د) ساخت بلوک‌های محوطه رواق‌های پیرامونی و صحن فاطمی (برای برجستگی عوارض خیابان‌ها و محوطه)
+            const outerCourtyardGeo = new THREE.BoxGeometry(6.5, 0.25, 5.0);
+            const outerCourtyard = new THREE.Mesh(outerCourtyardGeo, new THREE.MeshStandardMaterial({ color: 0xd8c3a5, roughness: 0.9 }));
+            outerCourtyard.position.set(-1.5, PLATE_H / 2 + 0.12, -0.2);
+            archGroup.add(outerCourtyard);
+
+            scene.add(archGroup);
         }
 
         function onResize() {
