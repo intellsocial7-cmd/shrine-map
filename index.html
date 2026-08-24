@@ -531,7 +531,7 @@
         }
 
         // ---------------------------------------------------------------
-        // Three.js 3D scene setup
+        // Three.js 3D scene setup with Heightmap Displacement for 3D Relief
         // ---------------------------------------------------------------
         const viewport = document.getElementById('mapViewport');
         const canvasEl = document.getElementById('threeCanvas');
@@ -548,16 +548,15 @@
         const gisSidebar = document.getElementById('gisSidebar');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-        // Model dimensions (matches the aspect ratio of the source 3D render / map2.jpg)
         const PLATE_W = 30;
         const PLATE_D = PLATE_W * (1839 / 2600);
-        const PLATE_H = 1.1;
+        const PLATE_H = 1.2;
 
         let scene, camera, renderer;
         let theta = degToRad(38), phi = degToRad(50);
         let radius = Math.max(PLATE_W, PLATE_D) * 1.55;
         const DEFAULT_THETA = theta, DEFAULT_PHI = phi, DEFAULT_RADIUS = radius;
-        let cameraTarget = null; // set once THREE is available
+        let cameraTarget = null;
         const MIN_RADIUS = Math.max(PLATE_W, PLATE_D) * 0.32;
         const MAX_RADIUS = Math.max(PLATE_W, PLATE_D) * 2.6;
         const MIN_PHI = degToRad(10), MAX_PHI = degToRad(86);
@@ -566,7 +565,7 @@
         let activePointers = new Map();
         let isDragging = false, dragMoved = false, lastX = 0, lastY = 0, prevPinchDist = null;
         let threeReady = false;
-        let cameraTween = null; // {startTheta,startPhi,startRadius,startTarget,endTheta,endPhi,endRadius,endTarget,startTime,duration}
+        let cameraTween = null;
 
         function degToRad(d) { return d * Math.PI / 180; }
 
@@ -581,32 +580,44 @@
             renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-            scene.add(new THREE.AmbientLight(0xffffff, 0.95));
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.55);
-            dirLight.position.set(12, 24, 10);
+            // نورپردازی پیشرفته جهت نمایان شدن برجستگی‌ها (3D Relief Shading)
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const dirLight = new THREE.DirectionalLight(0xfffaed, 0.9);
+            dirLight.position.set(15, 30, 20);
             scene.add(dirLight);
-            const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.25);
-            dirLight2.position.set(-10, 14, -12);
+
+            const dirLight2 = new THREE.DirectionalLight(0x3b82f6, 0.3);
+            dirLight2.position.set(-15, 20, -20);
             scene.add(dirLight2);
 
-            // Base plate (sides + bottom)
+            // بدنه زیرین پلاک
             const baseGeo = new THREE.BoxGeometry(PLATE_W, PLATE_H, PLATE_D);
-            const baseMat = new THREE.MeshStandardMaterial({ color: 0xC8A96A, roughness: 0.85, metalness: 0.05 });
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xC8A96A, roughness: 0.8, metalness: 0.1 });
             const baseMesh = new THREE.Mesh(baseGeo, baseMat);
             scene.add(baseMesh);
 
-            // Textured top surface (the shrine complex render)
+            // ایجاد صفحه با تراکم بالا (Grid Mesh) برای اعمال برجستگی‌های سه‌بعدی روی نقشه
             const loader = new THREE.TextureLoader();
             loader.load('map2.jpg', function (tex) {
                 if ('sRGBEncoding' in THREE) tex.encoding = THREE.sRGBEncoding;
                 tex.minFilter = THREE.LinearFilter;
                 tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-                const planeGeo = new THREE.PlaneGeometry(PLATE_W, PLATE_D);
-                const planeMat = new THREE.MeshBasicMaterial({ map: tex });
+
+                // ساخت Plane با وِرتکس‌های متراکم (128x128) جهت ایجاد برجستگی فیزیکی بر اساس روشنایی تصویر
+                const planeGeo = new THREE.PlaneGeometry(PLATE_W, PLATE_D, 128, 128);
+                const planeMat = new THREE.MeshStandardMaterial({
+                    map: tex,
+                    displacementMap: tex,      // ایجاد پستی و بلندی واقعی بر اساس رنگ نقشه
+                    displacementScale: 0.6,    // میزان ارتفاع برجستگی‌ها
+                    roughness: 0.75,
+                    metalness: 0.1
+                });
+
                 const planeMesh = new THREE.Mesh(planeGeo, planeMat);
                 planeMesh.rotation.x = -Math.PI / 2;
-                planeMesh.position.y = PLATE_H / 2 + 0.015;
+                planeMesh.position.y = PLATE_H / 2 + 0.02;
                 scene.add(planeMesh);
+
                 loadingIndicator.style.display = 'none';
             }, undefined, function () {
                 loadingIndicator.style.display = 'none';
@@ -636,7 +647,7 @@
         function worldPosForPct(leftPct, topPct) {
             const x = -PLATE_W / 2 + (leftPct / 100) * PLATE_W;
             const z = -PLATE_D / 2 + (topPct / 100) * PLATE_D;
-            const y = PLATE_H / 2 + 0.35;
+            const y = PLATE_H / 2 + 0.45;
             return new THREE.Vector3(x, y, z);
         }
 
@@ -684,7 +695,6 @@
             }
         }
 
-        // ---- Pointer (mouse / touch / pen) based orbit + pinch zoom ----
         function attachControlEvents() {
             const dismissHint = () => { dragHint.classList.add('hidden'); };
             setTimeout(dismissHint, 4500);
@@ -752,7 +762,6 @@
         }
 
         function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
-
         function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
         function tweenCameraTo(endTheta, endPhi, endRadius, endTargetVec, duration) {
@@ -902,6 +911,7 @@
                 const id = spot.getAttribute('data-id');
                 const item = database.find(l => l.id === id);
                 if (item) {
+                    showLevelInfo(item);
                     showLocationInfo(item);
                     smoothPanTo(item.left, item.top);
                 }
