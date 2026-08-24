@@ -531,7 +531,7 @@
         }
 
         // ---------------------------------------------------------------
-        // Three.js 3D scene setup with Heightmap Displacement for 3D Relief
+        // Three.js 3D scene setup (Clean 3D Base Block + Flat High-Res Map)
         // ---------------------------------------------------------------
         const viewport = document.getElementById('mapViewport');
         const canvasEl = document.getElementById('threeCanvas');
@@ -550,7 +550,7 @@
 
         const PLATE_W = 30;
         const PLATE_D = PLATE_W * (1839 / 2600);
-        const PLATE_H = 1.2;
+        const PLATE_H = 1.1; // ارتفاع بلوک زیرین برای جلوه سه‌بعدی تمیز
 
         let scene, camera, renderer;
         let theta = degToRad(38), phi = degToRad(50);
@@ -580,42 +580,30 @@
             renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-            // نورپردازی پیشرفته جهت نمایان شدن برجستگی‌ها (3D Relief Shading)
-            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-            const dirLight = new THREE.DirectionalLight(0xfffaed, 0.9);
-            dirLight.position.set(15, 30, 20);
+            // نورپردازی ملایم
+            scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            dirLight.position.set(10, 20, 15);
             scene.add(dirLight);
 
-            const dirLight2 = new THREE.DirectionalLight(0x3b82f6, 0.3);
-            dirLight2.position.set(-15, 20, -20);
-            scene.add(dirLight2);
-
-            // بدنه زیرین پلاک
+            // بلوک مکعبی زیرین نقشه برای ایجاد عمق و حالت سه‌بعدی واقعی
             const baseGeo = new THREE.BoxGeometry(PLATE_W, PLATE_H, PLATE_D);
             const baseMat = new THREE.MeshStandardMaterial({ color: 0xC8A96A, roughness: 0.8, metalness: 0.1 });
             const baseMesh = new THREE.Mesh(baseGeo, baseMat);
             scene.add(baseMesh);
 
-            // ایجاد صفحه با تراکم بالا (Grid Mesh) برای اعمال برجستگی‌های سه‌بعدی روی نقشه
+            // سطح صاف نقشه با کیفیت بسیار بالا بدون به هم ریختگی
             const loader = new THREE.TextureLoader();
             loader.load('map2.jpg', function (tex) {
                 if ('sRGBEncoding' in THREE) tex.encoding = THREE.sRGBEncoding;
                 tex.minFilter = THREE.LinearFilter;
                 tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-                // ساخت Plane با وِرتکس‌های متراکم (128x128) جهت ایجاد برجستگی فیزیکی بر اساس روشنایی تصویر
-                const planeGeo = new THREE.PlaneGeometry(PLATE_W, PLATE_D, 128, 128);
-                const planeMat = new THREE.MeshStandardMaterial({
-                    map: tex,
-                    displacementMap: tex,      // ایجاد پستی و بلندی واقعی بر اساس رنگ نقشه
-                    displacementScale: 0.6,    // میزان ارتفاع برجستگی‌ها
-                    roughness: 0.75,
-                    metalness: 0.1
-                });
-
+                const planeGeo = new THREE.PlaneGeometry(PLATE_W, PLATE_D);
+                const planeMat = new THREE.MeshBasicMaterial({ map: tex });
                 const planeMesh = new THREE.Mesh(planeGeo, planeMat);
                 planeMesh.rotation.x = -Math.PI / 2;
-                planeMesh.position.y = PLATE_H / 2 + 0.02;
+                planeMesh.position.y = PLATE_H / 2 + 0.015;
                 scene.add(planeMesh);
 
                 loadingIndicator.style.display = 'none';
@@ -647,7 +635,7 @@
         function worldPosForPct(leftPct, topPct) {
             const x = -PLATE_W / 2 + (leftPct / 100) * PLATE_W;
             const z = -PLATE_D / 2 + (topPct / 100) * PLATE_D;
-            const y = PLATE_H / 2 + 0.45;
+            const y = PLATE_H / 2 + 0.35;
             return new THREE.Vector3(x, y, z);
         }
 
@@ -891,6 +879,7 @@
         }
 
         function showLocationInfo(item) {
+            allHotspots.rows?.forEach?.(s => s.classList.remove('active'));
             allHotspots.forEach(s => s.classList.remove('active'));
             item.element.classList.add('active');
 
@@ -911,7 +900,6 @@
                 const id = spot.getAttribute('data-id');
                 const item = database.find(l => l.id === id);
                 if (item) {
-                    showLevelInfo(item);
                     showLocationInfo(item);
                     smoothPanTo(item.left, item.top);
                 }
