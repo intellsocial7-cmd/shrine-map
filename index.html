@@ -149,32 +149,36 @@
             100% { transform: translate(-50%, -50%) scale(1); }
         }
 
+        /* هدر و دکمه‌های بالای صفحه با چینش ریسپانسیو و مرتب */
         .gis-topbar {
-            position: absolute; top: 20px; left: 20px; right: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 300; pointer-events: none;
+            position: absolute; top: 15px; left: 15px; right: 15px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            z-index: 300; pointer-events: none; gap: 10px;
         }
-        .toolbar-group { display: flex; gap: 8px; pointer-events: auto; flex-wrap: wrap; align-items: center; }
+        .toolbar-group { 
+            display: flex; gap: 6px; pointer-events: auto; flex-wrap: wrap; align-items: center; 
+        }
         .gis-btn {
             background: var(--bg-card); backdrop-filter: blur(16px);
             border: 1px solid var(--border-glass); color: var(--text-main);
-            padding: 9px 14px; border-radius: 12px; font-weight: bold;
-            font-size: 12px; cursor: pointer; box-shadow: var(--shadow-elevated);
-            display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;
+            padding: 8px 12px; border-radius: 10px; font-weight: bold;
+            font-size: 11px; cursor: pointer; box-shadow: var(--shadow-elevated);
+            display: flex; align-items: center; gap: 5px; transition: all 0.2s ease;
         }
         .gis-btn:hover { background: var(--accent-gold); color: #020617; border-color: var(--accent-gold); }
         .gis-btn.active-lang { background: var(--accent-gold); color: #020617; }
         .gps-btn { background: var(--accent-blue); color: #fff; border: none; }
         .back-home-btn { background: #ef4444; color: #fff; border: none; }
 
+        /* کنترل‌های زوم منتقل شده به گوشه پایین راست برای دسترسی آسان‌تر با شست در موبایل */
         .zoom-controls {
-            position: absolute; bottom: 90px; left: 20px;
+            position: absolute; bottom: 25px; right: 20px;
             display: flex; flex-direction: column; gap: 8px; z-index: 300;
         }
         .zoom-btn {
-            width: 42px; height: 42px; background: var(--bg-card);
+            width: 44px; height: 44px; background: var(--bg-card);
             backdrop-filter: blur(16px); border: 1px solid var(--border-glass);
-            color: var(--text-main); font-size: 20px; font-weight: bold;
+            color: var(--text-main); font-size: 22px; font-weight: bold;
             border-radius: 12px; cursor: pointer; display: flex;
             align-items: center; justify-content: center; box-shadow: var(--shadow-elevated);
             transition: all 0.2s ease;
@@ -221,20 +225,20 @@
         .record-details h4 { margin: 0 0 4px 0; font-size: 14px; color: var(--text-main); }
         .record-details span { font-size: 11px; color: var(--text-muted); }
 
-        /* ساختار یکپارچه Bottom Sheet برای پنل اطلاعات در تمامی پلتفرم‌ها */
+        /* کارت کشویی پایین صفحه (Bottom Sheet) */
         .hud-panel {
             position: fixed;
-            bottom: -150px;
+            bottom: -200px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             background: var(--bg-card);
             backdrop-filter: blur(24px);
             border: 1px solid var(--border-glass);
             border-bottom: none;
-            border-radius: 20px 20px 0 0;
-            padding: 20px;
+            border-radius: 22px 22px 0 0;
+            padding: 18px 22px;
             box-shadow: var(--shadow-elevated);
             z-index: 600;
             opacity: 0;
@@ -248,7 +252,7 @@
             pointer-events: auto;
         }
         .hud-handle {
-            width: 40px; height: 4px; background: var(--text-muted);
+            width: 36px; height: 4px; background: var(--text-muted);
             border-radius: 2px; margin: 0 auto 12px auto; opacity: 0.4;
         }
         .hud-panel h3 { margin: 0 0 6px 0; color: var(--accent-gold); font-size: 16px; }
@@ -353,6 +357,7 @@
                 </div>
             </div>
 
+            <!-- دکمه‌های زوم در سمت راست پایین -->
             <div class="zoom-controls">
                 <button class="zoom-btn" onclick="zoomIn()">+</button>
                 <button class="zoom-btn" onclick="zoomOut()">-</button>
@@ -544,8 +549,10 @@
         let activeItem = null;
         let activeKey = "";
 
+        // متغیرهای حرفه‌ای برای مدیریت زوم دو انگشتی (Pinch-to-Zoom دقیق)
         let initialPinchDistance = null;
         let startScale = 1;
+        let pinchMidX = 0, pinchMidY = 0;
 
         function updateTransform() {
             canvas.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
@@ -603,6 +610,7 @@
 
         window.addEventListener('resize', initView);
 
+        // رویدادهای ماوس (دسکتاپ)
         viewport.addEventListener('mousedown', (e) => {
             isPanning = true; 
             startX = e.clientX - posX; 
@@ -616,6 +624,7 @@
         });
         window.addEventListener('mouseup', () => { isPanning = false; });
 
+        // رویدادهای لمسی اصلاح‌شده و دقیق برای موبایل (جابجایی تک‌انگشتی + زوم دو انگشتی روان)
         viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isPanning = true;
@@ -629,6 +638,10 @@
                     e.touches[0].clientY - e.touches[1].clientY
                 );
                 startScale = scale;
+                
+                const rect = viewport.getBoundingClientRect();
+                pinchMidX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
+                pinchMidY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
             }
         }, {passive: true});
 
@@ -644,7 +657,12 @@
                 );
                 const zoomFactor = currentDistance / initialPinchDistance;
                 let newScale = startScale * zoomFactor;
-                scale = Math.min(Math.max(newScale, 0.3), 5.0);
+                newScale = Math.min(Math.max(newScale, 0.3), 5.0);
+                
+                posX = pinchMidX - (pinchMidX - posX) * (newScale / scale);
+                posY = pinchMidY - (pinchMidY - posY) * (newScale / scale);
+                scale = newScale;
+                
                 updateTransform();
             }
         }, {passive: true});
@@ -654,6 +672,7 @@
             if (e.touches.length === 0) isPanning = false;
         });
 
+        // اسکرول ماوس برای زوم
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const zoomRate = 0.12, prevScale = scale;
@@ -792,7 +811,6 @@
             hudTitle.textContent = loc.title;
             hudDescription.textContent = loc.desc;
 
-            // نمایش کشویی پنل از پایین صفحه در تمامی پلتفرم‌ها
             hudPanel.classList.add('visible');
         }
 
