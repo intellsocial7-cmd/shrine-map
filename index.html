@@ -38,19 +38,13 @@
 
         #splashScreen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f6c2e; z-index: 1000;
+            background: #0f6c2e; z-index: 9999;
             display: flex; justify-content: center; align-items: center;
-            overflow-y: auto;
         }
         .splash-container {
             width: 100%; max-width: 480px; padding: 40px 25px;
             text-align: center; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            animation: fadeIn 1.2s ease-in-out; color: #ffffff;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            align-items: center; justify-content: center; color: #ffffff;
         }
         .logo-box {
             width: 140px; height: 140px; background: rgba(255, 255, 255, 0.05);
@@ -60,12 +54,10 @@
         }
         .logo-box svg { width: 100%; height: 100%; fill: #ffd700; }
         .splash-container h1 {
-            font-size: 28px; font-weight: 700; margin-bottom: 12px;
-            color: #ffd700; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 28px; font-weight: 700; margin-bottom: 12px; color: #ffd700;
         }
         .subtitle {
-            font-size: 15px; color: #ffffff; margin-bottom: 40px;
-            line-height: 1.8; opacity: 0.95;
+            font-size: 15px; color: #ffffff; margin-bottom: 40px; line-height: 1.8;
         }
         .buttons-container {
             display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 340px;
@@ -74,54 +66,37 @@
             background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.35);
             color: #ffffff; padding: 16px 20px; font-size: 18px; font-weight: 600;
             border-radius: 50px; cursor: pointer; transition: all 0.3s ease;
-            display: flex; justify-content: center; align-items: center; text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .splash-btn:hover {
             background: #ffd700; color: #0f6c2e; border-color: #ffd700;
-            transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 215, 0, 0.3);
         }
         .footer-text { margin-top: 50px; font-size: 13px; color: rgba(255, 255, 255, 0.6); }
 
         #gisAppContainer {
             display: none; width: 100%; height: 100%; position: relative;
         }
-
         .gis-platform-container {
             position: relative; width: 100vw; height: 100vh;
             overflow: hidden; display: flex; justify-content: center; align-items: center;
         }
-
         .map-viewport {
-            position: relative; width: 100%; height: 100%;
-            cursor: grab; overflow: hidden; touch-action: none;
+            position: relative; width: 100%; height: 100%; cursor: grab; overflow: hidden; touch-action: none;
         }
         .map-viewport:active { cursor: grabbing; }
-
         .map-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            transform-origin: 0 0;
-            will-change: transform;
-            width: 2400px;
-            height: 1600px;
+            position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; width: 2400px; height: 1600px;
         }
-
-        .map-canvas img {
-            display: block; width: 100%; height: 100%; pointer-events: none;
-        }
+        .map-canvas img { display: block; width: 100%; height: 100%; pointer-events: none; }
 
         .hotspot {
             position: absolute; width: 38px; height: 38px;
             background: rgba(245, 158, 11, 0.92); border: 3px solid #fff;
             border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%);
-            transition: transform 0.2s ease, background 0.2s ease; z-index: 100;
             display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: bold; color: #fff;
+            font-size: 12px; font-weight: bold; color: #fff; z-index: 100;
             box-shadow: 0 0 15px rgba(245, 158, 11, 0.7);
         }
-        .hotspot:hover { transform: translate(-50%, -50%) scale(1.3); background: var(--accent-gold); z-index: 150; }
-        .hotspot.active { background: var(--accent-green) !important; transform: translate(-50%, -50%) scale(1.4); z-index: 150; box-shadow: 0 0 25px var(--accent-green); }
+        .hotspot.active { background: var(--accent-green) !important; transform: translate(-50%, -50%) scale(1.4); }
 
         .sub-hotspot {
             position: absolute; width: 30px; height: 30px;
@@ -129,143 +104,76 @@
             border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%);
             display: flex; align-items: center; justify-content: center;
             font-size: 10px; font-weight: bold; color: #fff; z-index: 100;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
         }
         .sub-hotspot.wc { background: rgba(239, 68, 68, 0.92); }
-        .sub-hotspot:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 150; }
-        .sub-hotspot.active { background: var(--accent-green) !important; transform: translate(-50%, -50%) scale(1.4); z-index: 150; }
+        .sub-hotspot.active { background: var(--accent-green) !important; }
 
         #userLocationPin {
             position: absolute; width: 36px; height: 36px;
             background: var(--accent-blue); border: 3px solid #fff;
             border-radius: 50%; transform: translate(-50%, -50%);
-            display: none; align-items: center; justify-content: center;
-            z-index: 200; box-shadow: 0 0 25px var(--accent-blue);
-            animation: pulsePin 1.8s infinite;
-        }
-        @keyframes pulsePin {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.15); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+            display: none; align-items: center; justify-content: center; z-index: 200;
         }
 
-        /* هدر و دکمه‌های بالای صفحه با چینش ریسپانسیو و مرتب */
         .gis-topbar {
             position: absolute; top: 15px; left: 15px; right: 15px;
             display: flex; justify-content: space-between; align-items: flex-start;
             z-index: 300; pointer-events: none; gap: 10px;
         }
-        .toolbar-group { 
-            display: flex; gap: 6px; pointer-events: auto; flex-wrap: wrap; align-items: center; 
-        }
+        .toolbar-group { display: flex; gap: 6px; pointer-events: auto; flex-wrap: wrap; align-items: center; }
         .gis-btn {
             background: var(--bg-card); backdrop-filter: blur(16px);
             border: 1px solid var(--border-glass); color: var(--text-main);
             padding: 8px 12px; border-radius: 10px; font-weight: bold;
             font-size: 11px; cursor: pointer; box-shadow: var(--shadow-elevated);
-            display: flex; align-items: center; gap: 5px; transition: all 0.2s ease;
         }
-        .gis-btn:hover { background: var(--accent-gold); color: #020617; border-color: var(--accent-gold); }
+        .gis-btn:hover { background: var(--accent-gold); color: #020617; }
         .gis-btn.active-lang { background: var(--accent-gold); color: #020617; }
         .gps-btn { background: var(--accent-blue); color: #fff; border: none; }
         .back-home-btn { background: #ef4444; color: #fff; border: none; }
+        .view-switch-btn { background: #8b5cf6; color: #fff; border: none; }
 
-        /* کنترل‌های زوم منتقل شده به گوشه پایین راست برای دسترسی آسان‌تر با شست در موبایل */
         .zoom-controls {
             position: absolute; bottom: 25px; right: 20px;
             display: flex; flex-direction: column; gap: 8px; z-index: 300;
         }
         .zoom-btn {
             width: 44px; height: 44px; background: var(--bg-card);
-            backdrop-filter: blur(16px); border: 1px solid var(--border-glass);
-            color: var(--text-main); font-size: 22px; font-weight: bold;
-            border-radius: 12px; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; box-shadow: var(--shadow-elevated);
-            transition: all 0.2s ease;
+            border: 1px solid var(--border-glass); color: var(--text-main);
+            font-size: 22px; font-weight: bold; border-radius: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
-        .zoom-btn:hover { background: var(--accent-gold); color: #020617; border-color: var(--accent-gold); }
 
         .gis-sidebar {
             position: absolute; top: 0; right: -440px; width: 420px; height: 100%;
             background: var(--bg-card); backdrop-filter: blur(24px);
             border-left: 1px solid var(--border-glass); display: flex;
-            flex-direction: column; z-index: 500; box-shadow: var(--shadow-elevated);
-            transition: right 0.4s ease; pointer-events: auto;
+            flex-direction: column; z-index: 500; transition: right 0.4s ease; pointer-events: auto;
         }
-        html[dir="ltr"] .gis-sidebar { right: auto; left: -440px; border-left: none; border-right: 1px solid var(--border-glass); }
         .gis-sidebar.open { right: 0; }
-        html[dir="ltr"] .gis-sidebar.open { left: 0; right: auto; }
-
-        .sidebar-header {
-            padding: 25px 20px; border-bottom: 1px solid var(--border-glass);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h2 { margin: 0; font-size: 17px; color: var(--accent-gold); }
         .close-btn { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
-
         .search-container { padding: 15px 20px; }
-        .search-input {
-            width: 100%; background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass); padding: 12px 16px;
-            border-radius: 12px; color: var(--text-main); font-family: Tahoma; font-size: 13px; outline: none;
-        }
-
+        .search-input { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); padding: 12px; border-radius: 12px; color: var(--text-main); outline: none; }
         .records-list { flex: 1; overflow-y: auto; padding: 0 15px 20px 15px; }
-        .record-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass);
-            padding: 14px; border-radius: 14px; margin-bottom: 10px; cursor: pointer;
-            display: flex; align-items: center; gap: 14px; transition: all 0.2s;
-        }
-        .record-card:hover { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-gold); }
-        .record-badge {
-            width: 32px; height: 32px; background: var(--accent-gold); color: #020617;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 12px; flex-shrink: 0;
-        }
-        .record-details h4 { margin: 0 0 4px 0; font-size: 14px; color: var(--text-main); }
+        .record-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); padding: 14px; border-radius: 14px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 14px; }
+        .record-badge { width: 32px; height: 32px; background: var(--accent-gold); color: #020617; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .record-details h4 { margin: 0 0 4px 0; font-size: 14px; }
         .record-details span { font-size: 11px; color: var(--text-muted); }
 
-        /* کارت کشویی پایین صفحه (Bottom Sheet) */
         .hud-panel {
-            position: fixed;
-            bottom: -200px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            width: 100%;
-            max-width: 500px;
-            background: var(--bg-card);
-            backdrop-filter: blur(24px);
-            border: 1px solid var(--border-glass);
-            border-bottom: none;
-            border-radius: 22px 22px 0 0;
-            padding: 18px 22px;
-            box-shadow: var(--shadow-elevated);
-            z-index: 600;
-            opacity: 0;
-            transition: bottom 0.35s cubic-bezier(0.1, 1, 0.1, 1), opacity 0.3s ease, transform 0.3s ease;
-            pointer-events: none;
+            position: fixed; bottom: -200px; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 500px; background: var(--bg-card);
+            border: 1px solid var(--border-glass); border-bottom: none; border-radius: 22px 22px 0 0;
+            padding: 18px 22px; z-index: 600; opacity: 0; transition: bottom 0.35s ease, opacity 0.3s ease; pointer-events: none;
         }
-        .hud-panel.visible {
-            bottom: 0;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-            pointer-events: auto;
-        }
-        .hud-handle {
-            width: 36px; height: 4px; background: var(--text-muted);
-            border-radius: 2px; margin: 0 auto 12px auto; opacity: 0.4;
-        }
+        .hud-panel.visible { bottom: 0; opacity: 1; pointer-events: auto; }
+        .hud-handle { width: 36px; height: 4px; background: var(--text-muted); border-radius: 2px; margin: 0 auto 12px auto; opacity: 0.4; }
         .hud-panel h3 { margin: 0 0 6px 0; color: var(--accent-gold); font-size: 16px; }
-        .hud-panel p { margin: 0 0 14px 0; color: var(--text-main); font-size: 13px; line-height: 1.5; }
+        .hud-panel p { margin: 0 0 14px 0; font-size: 13px; line-height: 1.5; }
         .hud-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 10px; }
-        .action-btn { background: var(--accent-gold); color: #020617; border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .action-btn:hover { opacity: 0.9; transform: scale(1.05); }
-
-        @media (max-width: 768px) {
-            .gis-sidebar { width: 100%; right: -100%; left: auto; max-width: none; }
-            html[dir="ltr"] .gis-sidebar { left: -100%; right: auto; }
-            .gis-sidebar.open { right: 0; left: auto; }
-        }
+        .action-btn { background: var(--accent-gold); color: #020617; border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -309,44 +217,12 @@
         <div class="gis-platform-container">
             <div class="map-viewport" id="mapViewport">
                 <div class="map-canvas" id="mapCanvas">
-                    <img src="map2.jpg" id="mainMapImg" alt="خريطة الروضة المقدسة">
-                    
+                    <img src="1 (1).jpg" id="mainMapImg" alt="خريطة الروضة المقدسة">
                     <div id="userLocationPin">📍</div>
-
-                    <div class="hotspot" style="top: 83.5%; left: 57.5%;" data-id="1" data-key="gate_qibla">1</div>
-                    <div class="hotspot" style="top: 76.5%; left: 77.5%;" data-id="2" data-key="gate_ridha">2</div>
-                    <div class="hotspot" style="top: 71.0%; left: 81.0%;" data-id="3" data-key="gate_muslim">3</div>
-                    <div class="hotspot" style="top: 61.5%; left: 74.0%;" data-id="4" data-key="gate_tusi">4</div>
-                    <div class="hotspot" style="top: 79.5%; left: 41.5%;" data-id="5" data-key="gate_hasan">5</div>
-                    <div class="hotspot" style="top: 48.0%; left: 66.0%;" data-id="6" data-key="gate_hussein">6</div>
-                    <div class="hotspot" style="top: 72.0%; left: 60.5%;" data-id="7" data-key="gate_faraj">7</div>
-                    <div class="hotspot" style="top: 55.5%; left: 29.0%;" data-id="8" data-key="gate_khatam">8</div>
-                    <div class="hotspot" style="top: 51.5%; left: 42.5%;" data-id="9" data-key="gate_awsiya">9</div>
-                    <div class="hotspot" style="top: 31.0%; left: 16.5%;" data-id="10" data-key="gate_zahra">10</div>
-                    <div class="hotspot" style="top: 59.5%; left: 63.5%;" data-id="11" data-key="shrine_imran">11</div>
-                    <div class="hotspot" style="top: 38.0%; left: 53.0%;" data-id="12" data-key="shrine_gharawiya">12</div>
-                    <div class="hotspot" style="top: 53.5%; left: 37.0%;" data-id="13" data-key="service_bridge">13</div>
-                    <div class="hotspot" style="top: 42.0%; left: 21.5%;" data-id="14" data-key="service_admin">14</div>
-                    <div class="hotspot" style="top: 51.0%; left: 26.5%;" data-id="15" data-key="shrine_library">15</div>
-                    <div class="hotspot" style="top: 33.5%; left: 31.5%;" data-id="16" data-key="service_guesthouse">16</div>
-                    <div class="hotspot" style="top: 38.0%; left: 35.5%;" data-id="17" data-key="shrine_museum">17</div>
-                    <div class="hotspot" style="top: 39.5%; left: 25.0%;" data-id="18" data-key="service_pilgrim">18</div>
-                    <div class="hotspot" style="top: 81.0%; left: 39.0%;" data-id="19" data-key="entry_abozar">19</div>
-                    <div class="hotspot" style="top: 77.0%; left: 41.5%;" data-id="20" data-key="entry_miqdad">20</div>
-                    <div class="hotspot" style="top: 51.5%; left: 63.0%;" data-id="21" data-key="entry_salman">21</div>
-                    <div class="hotspot" style="top: 51.5%; left: 59.5%;" data-id="22" data-key="entry_ammar">22</div>
-
-                    <div class="sub-hotspot" style="top: 81.5%; left: 29.5%;" data-id="S1" data-key="sub_rest">💤</div>
-                    <div class="sub-hotspot" style="top: 92.5%; left: 41.5%;" data-id="S2" data-key="sub_lost">🎒</div>
-                    <div class="sub-hotspot" style="top: 24.5%; left: 91.5%;" data-id="S3" data-key="sub_parking">🅿️</div>
-                    <div class="sub-hotspot wc" style="top: 76.5%; left: 9.5%;" data-id="WC1" data-key="wc_1">🚻</div>
-                    <div class="sub-hotspot wc" style="top: 22.0%; left: 11.5%;" data-id="WC3" data-key="wc_3">🚻</div>
-                    <div class="sub-hotspot wc" style="top: 22.5%; left: 38.5%;" data-id="WC4" data-key="wc_4">🚻</div>
-                    <div class="sub-hotspot wc" style="top: 71.0%; left: 91.5%;" data-id="WC5" data-key="wc_5">🚻</div>
+                    <div id="hotspotsContainer"></div>
                 </div>
             </div>
 
-            <!-- پنل اطلاعات کشویی از پایین (Bottom Sheet) -->
             <div class="hud-panel" id="hudPanel">
                 <div class="hud-handle"></div>
                 <h3 id="hudTitle">معلومات المكان</h3>
@@ -357,7 +233,6 @@
                 </div>
             </div>
 
-            <!-- دکمه‌های زوم در سمت راست پایین -->
             <div class="zoom-controls">
                 <button class="zoom-btn" onclick="zoomIn()">+</button>
                 <button class="zoom-btn" onclick="zoomOut()">-</button>
@@ -366,6 +241,7 @@
             <div class="gis-topbar">
                 <div class="toolbar-group">
                     <button class="gis-btn back-home-btn" onclick="goToSplash()">⬅ <span id="txtBackHome">بازگشت</span></button>
+                    <button class="gis-btn view-switch-btn" onclick="switchNextView()">🔄 <span id="txtSwitchView">تغییر نما</span></button>
                     <button class="gis-btn gps-btn" onclick="locateUser()" id="btnGps">📍 موقعي</button>
                     <button class="gis-btn" onclick="toggleSidebar()"><span id="txtMenuIcon">☰</span> <span id="txtMenuList">قائمة الأماكن</span></button>
                     <button class="gis-btn" onclick="toggleAppTheme()" id="themeToggleBtn">🌙 الوضع الليلي</button>
@@ -391,117 +267,149 @@
     </div>
 
     <script>
+        // مختصات کاملاً فیکس‌شده و تطبیق‌یافته بر اساس آخرین تصاویر راهنما
+        const viewsData = [
+            {
+                image: "1 (1).jpg",
+                coords: {
+                    gate_qibla: { top: 83.5, left: 57.5 }, gate_ridha: { top: 76.5, left: 77.5 }, gate_muslim: { top: 71.0, left: 81.0 }, gate_tusi: { top: 61.5, left: 74.0 }, gate_hasan: { top: 79.5, left: 41.5 }, gate_hussein: { top: 48.0, left: 66.0 }, gate_faraj: { top: 72.0, left: 60.5 }, gate_khatam: { top: 55.5, left: 29.0 }, gate_awsiya: { top: 51.5, left: 42.5 }, gate_zahra: { top: 31.0, left: 16.5 }, shrine_imran: { top: 59.5, left: 63.5 }, shrine_gharawiya: { top: 38.0, left: 53.0 }, service_bridge: { top: 53.5, left: 37.0 }, service_admin: { top: 42.0, left: 21.5 }, shrine_library: { top: 51.0, left: 26.5 }, service_guesthouse: { top: 33.5, left: 31.5 }, shrine_museum: { top: 38.0, left: 35.5 }, service_pilgrim: { top: 39.5, left: 25.0 }, entry_abozar: { top: 81.0, left: 39.0 }, entry_miqdad: { top: 77.0, left: 41.5 }, entry_salman: { top: 51.5, left: 63.0 }, entry_ammar: { top: 51.5, left: 59.5 }, sub_rest: { top: 81.5, left: 29.5 }, sub_lost: { top: 92.5, left: 41.5 }, sub_parking: { top: 24.5, left: 91.5 }, wc_1: { top: 76.5, left: 9.5 }, wc_3: { top: 22.0, left: 11.5 }, wc_4: { top: 22.5, left: 38.5 }, wc_5: { top: 71.0, left: 91.5 }
+                }
+            },
+            {
+                image: "1 (2).jpg",
+                coords: {
+                    gate_qibla: { top: 31.5, left: 91.0 }, gate_ridha: { top: 29.5, left: 88.0 }, gate_muslim: { top: 25.5, left: 90.0 }, gate_tusi: { top: 19.5, left: 85.5 }, gate_hasan: { top: 39.5, left: 87.5 }, gate_hussein: { top: 21.5, left: 63.5 }, gate_faraj: { top: 34.0, left: 93.5 }, gate_khatam: { top: 42.5, left: 85.0 }, gate_awsiya: { top: 35.5, left: 75.5 }, gate_zahra: { top: 32.5, left: 93.5 }, shrine_imran: { top: 45.0, left: 77.5 }, shrine_gharawiya: { top: 28.5, left: 64.0 }, service_bridge: { top: 45.5, left: 51.0 }, service_admin: { top: 46.5, left: 41.0 }, shrine_library: { top: 44.5, left: 57.0 }, service_guesthouse: { top: 42.5, left: 50.0 }, shrine_museum: { top: 40.5, left: 57.0 }, service_pilgrim: { top: 48.0, left: 61.0 }, entry_abozar: { top: 33.5, left: 94.0 }, entry_miqdad: { top: 36.5, left: 94.0 }, entry_salman: { top: 23.5, left: 78.0 }, entry_ammar: { top: 25.0, left: 80.0 }, sub_rest: { top: 43.5, left: 94.5 }, sub_lost: { top: 40.5, left: 94.5 }, sub_parking: { top: 11.5, left: 89.5 }, wc_1: { top: 36.5, left: 32.5 }, wc_3: { top: 35.5, left: 95.0 }, wc_4: { top: 40.5, left: 95.0 }, wc_5: { top: 11.5, left: 89.5 }
+                }
+            },
+            {
+                image: "1 (3).jpg",
+                coords: {
+                    gate_qibla: { top: 59.1, left: 0.8 }, gate_ridha: { top: 83.1, left: 3.1 }, gate_muslim: { top: 89.6, left: 15.8 }, gate_tusi: { top: 82.6, left: 33.9 }, gate_hasan: { top: 37.2, left: 5.9 }, gate_hussein: { top: 51.3, left: 52.1 }, gate_faraj: { top: 66.4, left: 1.7 }, gate_khatam: { top: 24.5, left: 17.0 }, gate_awsiya: { top: 39.7, left: 24.2 }, gate_zahra: { top: 55.8, left: 46.8 }, shrine_imran: { top: 53.5, left: 12.8 }, shrine_gharawiya: { top: 31.5, left: 78.6 }, service_bridge: { top: 29.7, left: 25.3 }, service_admin: { top: 11.2, left: 46.1 }, shrine_library: { top: 21.1, left: 27.7 }, service_guesthouse: { top: 13.5, left: 70.7 }, shrine_museum: { top: 18.4, left: 50.4 }, service_pilgrim: { top: 12.4, left: 52.5 }, entry_abozar: { top: 40.1, left: 8.4 }, entry_miqdad: { top: 78.1, left: 49.8 }, entry_salman: { top: 48.4, left: 42.0 }, entry_ammar: { top: 41.8, left: 43.8 }, sub_rest: { top: 30.8, left: 5.6 }, sub_lost: { top: 52.5, left: 1.3 }, sub_parking: { top: 45.3, left: 97.6 }, wc_1: { top: 36.0, left: 13.1 }, wc_3: { top: 57.3, left: 79.3 }, wc_4: { top: 70.2, left: 11.0 }, wc_5: { top: 96.1, left: 22.6 }
+                }
+            },
+            {
+                image: "1 (4).jpg",
+                coords: {
+                    gate_qibla: { top: 88.3, left: 96.3 }, gate_ridha: { top: 66.9, left: 98.3 }, gate_muslim: { top: 56.8, left: 97.6 }, gate_tusi: { top: 49.6, left: 90.9 }, gate_hasan: { top: 90.5, left: 72.2 }, gate_hussein: { top: 43.6, left: 81.7 }, gate_faraj: { top: 72.2, left: 91.1 }, gate_khatam: { top: 85.3, left: 63.9 }, gate_awsiya: { top: 37.0, left: 26.2 }, gate_zahra: { top: 51.7, left: 34.4 }, shrine_imran: { top: 63.4, left: 88.1 }, shrine_gharawiya: { top: 40.5, left: 62.8 }, service_bridge: { top: 74.5, left: 66.0 }, service_admin: { top: 74.6, left: 32.6 }, shrine_library: { top: 83.6, left: 54.1 }, service_guesthouse: { top: 52.7, left: 41.0 }, shrine_museum: { top: 57.5, left: 47.6 }, service_pilgrim: { top: 66.5, left: 32.7 }, entry_abozar: { top: 93.1, left: 74.5 }, entry_miqdad: { top: 92.4, left: 70.0 }, entry_salman: { top: 54.3, left: 82.4 }, entry_ammar: { top: 56.4, left: 78.0 }, sub_rest: { top: 97.0, left: 78.6 }, sub_lost: { top: 97.1, left: 97.4 }, sub_parking: { top: 2.9, left: 78.4 }, wc_1: { top: 24.2, left: 34.7 }, wc_3: { top: 50.3, left: 98.6 }, wc_4: { top: 65.0, left: 14.4 }, wc_5: { top: 97.1, left: 61.1 }
+                }
+            }
+        ];
+
+        let currentViewIndex = 0;
+        let currentLang = 'ar';
+
         const translations = {
             ar: {
-                title: "قائمة أماكن وخدمات الروضة", searchPlaceholder: "بحث عن مكان، استراحة، دورات مياه...", myLocation: "📍 موقعي", menuList: "قائمة الأماكن", darkMode: "🌙 الوضع الليلي", lightMode: "☀️ الوضع النهاري", guideLabel: "إرشادات الزائر", audioBtn: "🔊 تشغيل الصوت", infoTitle: "معلومات المكان", selectPrompt: "انقر على النقاط لعرض التفاصيل.", backHome: "الرئيسية",
+                title: "قائمة أماكن وخدمات الروضة", searchPlaceholder: "بحث عن مكان، استراحة، دورات مياه...", myLocation: "📍 موقعي", menuList: "قائمة الأماكن", darkMode: "🌙 الوضع الليلي", lightMode: "☀️ الوضع النهاري", guideLabel: "إرشادات الزائر", audioBtn: "🔊 تشغيل الصوت", infoTitle: "معلومات المكان", backHome: "الرئيسية", switchView: "تغيير نما",
                 locs: {
-                    gate_qibla: { title: "١. باب القبلة", desc: "المدخل الرئيسي والجنوبي للروضة المقدسة.", top: 83.5, left: 57.5 },
-                    gate_ridha: { title: "٢. باب الإمام الرضا (ع)", desc: "مدخل السيدات المخصص في الجانب الشرقي.", top: 76.5, left: 77.5 },
-                    gate_muslim: { title: "٣. باب مسلم بن عقيل (ع)", desc: "البوابة الشرقية المؤدية إلى الأروقة.", top: 71.0, left: 81.0 },
-                    gate_tusi: { title: "٤. باب الطوسي", desc: "البوابة الشمالية المرتبطة بشارع الطوسي.", top: 61.5, left: 74.0 },
-                    gate_hasan: { title: "٥. باب الإمام الحسن (ع)", desc: "مدخل السيدات في الجانب الغربي.", top: 79.5, left: 41.5 },
-                    gate_hussein: { title: "٦. باب الإمام الحسين (ع)", desc: "الوصول الشمالي للصحن والأروقة المطهرة.", top: 48.0, left: 66.0 },
-                    gate_faraj: { title: "٧. باب الفرج", desc: "ممر داخلي لتسهيل حركة الحشود.", top: 72.0, left: 60.5 },
-                    gate_khatam: { title: "٨. باب خاتم الأنبياء (ص)", desc: "بوابة مجاورة للمكتبة الكبرى.", top: 55.5, left: 29.0 },
-                    gate_awsiya: { title: "٩. باب سيد الأوصياء (ع)", desc: "ممر ارتباطي شمالي مجهز بشاشات إرشادية.", top: 51.5, left: 42.5 },
-                    gate_zahra: { title: "١٠. باب السيدة الزهراء (ع)", desc: "بوابة كبرى في مشروع توسعة صحن فاطمة الزهراء (ع).", top: 31.0, left: 16.5 },
-                    shrine_imran: { title: "١١. جامع عمر بن شاهين", desc: "مسجد تاريخي داخل العتبة المقدسة.", top: 59.5, left: 63.5 },
-                    shrine_gharawiya: { title: "١٢. المدرسة الغروية", desc: "مدرسة دينية تاريخية في الأروقة الغربية.", top: 38.0, left: 53.0 },
-                    service_bridge: { title: "١٣. جسر أبي الفضل العباس (ع)", desc: "جسر المشاة لتخفيف الزحام.", top: 53.5, left: 37.0 },
-                    service_admin: { title: "١٤. الإدارة العامة", desc: "مكاتب الإدارة ومتابعة الشؤون الشرعية.", top: 42.0, left: 21.5 },
-                    shrine_library: { title: "١٥. مكتبة الروضة الحيدرية", desc: "مكتبة كبرى تضم آلاف المخطوطات.", top: 51.0, left: 26.5 },
-                    service_guesthouse: { title: "١٦. دار ضيافة أمير المؤمنين", desc: "مضيف زوار أمير المؤمنين (ع).", top: 33.5, left: 31.5 },
-                    shrine_museum: { title: "١٧. المتحف العلوي", desc: "معرض الآثار والتحف التاريخية.", top: 38.0, left: 35.5 },
-                    service_pilgrim: { title: "١٨. مضيف زوار الكرام", desc: "وحدة خدمية لضيافة الزائرين.", top: 39.5, left: 25.0 },
-                    entry_abozar: { title: "١٩. مدخل أبي ذر الغفاري", desc: "ممر فرعي للعبور.", top: 81.0, left: 39.0 },
-                    entry_miqdad: { title: "٢٠. مدخل المقداد بن الأسود", desc: "طريق الوصول والعبور.", top: 77.0, left: 41.5 },
-                    entry_salman: { title: "٢١. مدخل سلمان المحمدي", desc: "منطقة المدخل والعبور.", top: 51.5, left: 63.0 },
-                    entry_ammar: { title: "٢٢. مدخل عمار بن ياسر", desc: "ممر جهة الشمال.", top: 51.5, left: 59.5 },
-                    sub_rest: { title: "استراحة أم البنين (ع)", desc: "استراحة مجهزة للزائرين في الغرب.", top: 81.5, left: 29.5 },
-                    sub_lost: { title: "مركز المفقودات والأمانات", desc: "استلام الأمانات والمفقودات.", top: 92.5, left: 41.5 },
-                    sub_parking: { title: "مواقف وادي السلام متعددة الطوابق", desc: "موقف سيارات واسع للزائرين.", top: 24.5, left: 91.5 },
-                    wc_1: { title: "دورات المياه (الحويش)", desc: "مجمّع صحي عام.", top: 76.5, left: 9.5 },
-                    wc_3: { title: "دورات المياه (الشمال الغربي)", desc: "مجمّع صحي عام.", top: 22.0, left: 11.5 },
-                    wc_4: { title: "دورات المياه (الشمالي)", desc: "مجمّع صحي عام.", top: 22.5, left: 38.5 },
-                    wc_5: { title: "دورات المياه (الشرقي)", desc: "مجمّع صحي عام.", top: 71.0, left: 91.5 }
+                    gate_qibla: { title: "١. باب القبلة", desc: "المدخل الرئيسي والجنوبي للروضة المقدسة." },
+                    gate_ridha: { title: "٢. باب الإمام الرضا (ع)", desc: "مدخل السيدات المخصص في الجانب الشرقي." },
+                    gate_muslim: { title: "٣. باب مسلم بن عقيل (ع)", desc: "البوابة الشرقية المؤدية إلى الأروقة." },
+                    gate_tusi: { title: "٤. باب الطوسي", desc: "البوابة الشمالية المرتبطة بشارع الطوسي." },
+                    gate_hasan: { title: "٥. باب الإمام الحسن (ع)", desc: "مدخل السيدات في الجانب الغربي." },
+                    gate_hussein: { title: "٦. باب الإمام الحسين (ع)", desc: "الوصول الشمالي للصحن والأروقة المطهرة." },
+                    gate_faraj: { title: "٧. باب الفرج", desc: "ممر داخلي لتسهيل حركة الحشود." },
+                    gate_khatam: { title: "٨. باب خاتم الأنبياء (ص)", desc: "بوابة مجاورة للمكتبة الكبرى." },
+                    gate_awsiya: { title: "٩. باب سيد الأوصياء (ع)", desc: "ممر ارتباطي شمالي مجهز بشاشات إرشادية." },
+                    gate_zahra: { title: "١٠. باب السيدة الزهراء (ع)", desc: "بوابة كبرى في مشروع توسعة صحن فاطمة الزهراء (ع)." },
+                    shrine_imran: { title: "١١. جامع عمر بن شاهين", desc: "مسجد تاريخي داخل العتبة المقدسة." },
+                    shrine_gharawiya: { title: "١٢. المدرسة الغروية", desc: "مدرسة دينية تاريخية في الأروقة الغربية." },
+                    service_bridge: { title: "١٣. جسر أبي الفضل العباس (ع)", desc: "جسر المشاة لتخفيف الزحام." },
+                    service_admin: { title: "١٤. الإدارة العامة", desc: "مكاتب الإدارة ومتابعة الشؤون الشرعية." },
+                    shrine_library: { title: "١٥. مكتبة الروضة الحيدرية", desc: "مكتبة كبرى تضم آلاف المخطوطات." },
+                    service_guesthouse: { title: "١٦. دار ضيافة أمير المؤمنين", desc: "مضيف زوار أمير المؤمنين (ع)." },
+                    shrine_museum: { title: "١٧. المتحف العلوي", desc: "معرض الآثار والتحف التاريخية." },
+                    service_pilgrim: { title: "١٨. مضيف زوار الكرام", desc: "وحدة خدمية لضيافة الزائرين." },
+                    entry_abozar: { title: "١٩. مدخل أبي ذر الغفاري", desc: "ممر فرعي للعبور." },
+                    entry_miqdad: { title: "٢٠. مدخل المقداد بن الأسود", desc: "طريق الوصول والعبور." },
+                    entry_salman: { title: "٢١. مدخل سلمان المحمدي", desc: "منطقة المدخل والعبور." },
+                    entry_ammar: { title: "٢٢. مدخل عمار بن ياسر", desc: "ممر جهة الشمال." },
+                    sub_rest: { title: "استراحة أم البنين (ع)", desc: "استراحة مجهزة للزائرين في الغرب." },
+                    sub_lost: { title: "مركز المفقودات والأمانات", desc: "استلام الأمانات والمفقودات." },
+                    sub_parking: { title: "مواقف وادي السلام متعددة الطوابق", desc: "موقف سيارات واسع للزائرين." },
+                    wc_1: { title: "دورات المياه (الحويش)", desc: "مجمّع صحي عام." },
+                    wc_3: { title: "دورات المياه (الشمال الغربي)", desc: "مجمّع صحي عام." },
+                    wc_4: { title: "دورات المياه (الشمالي)", desc: "مجمّع صحي عام." },
+                    wc_5: { title: "دورات المياه (الشرقي)", desc: "مجمّع صحي عام." }
                 }
             },
             fa: {
-                title: "فهرست اماکن و خدمات حرم", searchPlaceholder: "جستجوی مکان، استراحتگاه، سرویس...", myLocation: "📍 موقعیت من", menuList: "فهرست اماکن", darkMode: "🌙 حالت شب", lightMode: "☀️ حالت روز", guideLabel: "راهنمای زائر", audioBtn: "🔊 پخش صوت", infoTitle: "اطلاعات مکان", selectPrompt: "برای مشاهده اطلاعات روی پین‌ها کلیک کنید.", backHome: "بازگشت",
+                title: "فهرست اماکن و خدمات حرم", searchPlaceholder: "جستجوی مکان، استراحتگاه، سرویس...", myLocation: "📍 موقعیت من", menuList: "فهرست اماکن", darkMode: "🌙 حالت شب", lightMode: "☀️ حالت روز", guideLabel: "راهنمای زائر", audioBtn: "🔊 پخش صوت", infoTitle: "اطلاعات مکان", selectPrompt: "برای مشاهده اطلاعات روی پین‌ها کلیک کنید.", backHome: "بازگشت", switchView: "تغییر نما",
                 locs: {
-                    gate_qibla: { title: "۱. باب القبله", desc: "ورودی اصلی و جنوبی حرم مطهر.", top: 83.5, left: 57.5 },
-                    gate_ridha: { title: "۲. باب الإمام الرضا (ع)", desc: "ورودی اختصاصی بانوان در ضلع شرقی.", top: 76.5, left: 77.5 },
-                    gate_muslim: { title: "۳. باب مسلم بن عقیل (ع)", desc: "درگاه شرقی منتهی به رواق‌ها.", top: 71.0, left: 81.0 },
-                    gate_tusi: { title: "۴. باب الطوسي", desc: "ورودی شمالی حرم.", top: 61.5, left: 74.0 },
-                    gate_hasan: { title: "۵. باب الإمام الحسن (ع)", desc: "ورودی بانوان غربی.", top: 79.5, left: 41.5 },
-                    gate_hussein: { title: "۶. باب الإمام الحسين (ع)", desc: "دسترسی شمالی به صحن.", top: 48.0, left: 66.0 },
-                    gate_faraj: { title: "۷. باب الفرج", desc: "گذرگاه داخلی.", top: 72.0, left: 60.5 },
-                    gate_khatam: { title: "۸. باب خاتم الأنبياء (ص)", desc: "ورودی مجاور کتابخانه.", top: 55.5, left: 29.0 },
-                    gate_awsiya: { title: "۹. باب سيد الأوصياء (ع)", desc: "معبر شمالی.", top: 51.5, left: 42.5 },
-                    gate_zahra: { title: "۱۰. باب السيدة الزهراء (ع)", desc: "درگاه توسعه صحن حضرت زهرا.", top: 31.0, left: 16.5 },
-                    shrine_imran: { title: "۱۱. جامع عمران بن شاهين", desc: "مسجد تاریخی داخل مجموعه.", top: 59.5, left: 63.5 },
-                    shrine_gharawiya: { title: "۱۲. المدرسة الغروية", desc: "مدرسه علمیه تاریخی.", top: 38.0, left: 53.0 },
-                    service_bridge: { title: "۱۳. جسر أبي الفضل العباس (ع)", desc: "پل ارتباطی زائران.", top: 53.5, left: 37.0 },
-                    service_admin: { title: "۱۴. الإدارة العامة", desc: "ساختمان اداری.", top: 42.0, left: 21.5 },
-                    shrine_library: { title: "۱۵. مكتبة الروضة الحيدرية", desc: "کتابخانه بزرگ حیدریه.", top: 51.0, left: 26.5 },
-                    service_guesthouse: { title: "۱۶. دار ضيافة أمير المؤمنين", desc: "مهمانسرای زائرین.", top: 33.5, left: 31.5 },
-                    shrine_museum: { title: "۱۷. المتحف العلوي", desc: "موزه آثار تاریخی.", top: 38.0, left: 35.5 },
-                    service_pilgrim: { title: "۱۸. مضيف زائرین الکرام", desc: "واحد خدماتی پذیرایی.", top: 39.5, left: 25.0 },
-                    entry_abozar: { title: "۱۹. مدخل أبي ذر الغفاري", desc: "گذرگاه ابوذر.", top: 81.0, left: 39.0 },
-                    entry_miqdad: { title: "۲۰. مدخل المقداد بن الأسود", desc: "مسیر دسترسی مقداد.", top: 77.0, left: 41.5 },
-                    entry_salman: { title: "۲۱. مدخل سلمان المحمدي", desc: "ورودی سلمان.", top: 51.5, left: 63.0 },
-                    entry_ammar: { title: "۲۲. مدخل عمار بن ياسر", desc: "گذرگاه عمار یاسر.", top: 51.5, left: 59.5 },
-                    sub_rest: { title: "استراحتگاه أم البنين (ع)", desc: "استراحتگاه مجهز زائرین.", top: 81.5, left: 29.5 },
-                    sub_lost: { title: "واحد امانات و اشیاء گمشده", desc: "مرکز نگهداری امانات.", top: 92.5, left: 41.5 },
-                    sub_parking: { title: "پارکینگ طبقاتی وادی‌السلام", desc: "پارکینگ خودروهای زائران.", top: 24.5, left: 91.5 },
-                    wc_1: { title: "سرویس بهداشتی (غرب)", desc: "مجموعه بهداشتی عمومی.", top: 76.5, left: 9.5 },
-                    wc_3: { title: "سرویس بهداشتی (شمال غربی)", desc: "مجموعه بهداشتی عمومی.", top: 22.0, left: 11.5 },
-                    wc_4: { title: "سرویس بهداشتی (شمالی)", desc: "مجموعه بهداشتی عمومی.", top: 22.5, left: 38.5 },
-                    wc_5: { title: "سرویس بهداشتی (شرقی)", desc: "مجموعه بهداشتی عمومی.", top: 71.0, left: 91.5 }
+                    gate_qibla: { title: "۱. باب القبله", desc: "ورودی اصلی و جنوبی حرم مطهر." },
+                    gate_ridha: { title: "۲. باب الإمام الرضا (ع)", desc: "ورودی اختصاصی بانوان در ضلع شرقی." },
+                    gate_muslim: { title: "۳. باب مسلم بن عقیل (ع)", desc: "درگاه شرقی منتهی به رواق‌ها." },
+                    gate_tusi: { title: "۴. باب الطوسي", desc: "ورودی شمالی حرم." },
+                    gate_hasan: { title: "۵. باب الإمام الحسن (ع)", desc: "ورودی بانوان غربی." },
+                    gate_hussein: { title: "۶. باب الإمام الحسين (ع)", desc: "دسترسی شمالی به صحن." },
+                    gate_faraj: { title: "۷. باب الفرج", desc: "گذرگاه داخلی." },
+                    gate_khatam: { title: "۸. باب خاتم الأنبياء (ص)", desc: "ورودی مجاور کتابخانه." },
+                    gate_awsiya: { title: "۹. باب سيد الأوصياء (ع)", desc: "معبر شمالی." },
+                    gate_zahra: { title: "۱۰. باب السيدة الزهراء (ع)", desc: "درگاه توسعه صحن حضرت زهرا." },
+                    shrine_imran: { title: "۱۱. جامع عمران بن شاهين", desc: "مسجد تاریخی داخل مجموعه." },
+                    shrine_gharawiya: { title: "۱۲. المدرسة الغروية", desc: "مدرسه علمیه تاریخی." },
+                    service_bridge: { title: "۱۳. جسر أبي الفضل العباس (ع)", desc: "پل ارتباطی زائران." },
+                    service_admin: { title: "۱۴. الإدارة العامة", desc: "ساختمان اداری." },
+                    shrine_library: { title: "۱۵. مكتبة الروضة الحيدرية", desc: "کتابخانه بزرگ حیدریه." },
+                    service_guesthouse: { title: "۱۶. دار ضيافة أمير المؤمنين", desc: "مهمانسرای زائرین." },
+                    shrine_museum: { title: "۱۷. المتحف العلوي", desc: "موزه آثار تاریخی." },
+                    service_pilgrim: { title: "۱۸. مضيف زائرین الکرام", desc: "واحد خدماتی پذیرایی." },
+                    entry_abozar: { title: "۱۹. مدخل أبي ذر الغفاري", desc: "گذرگاه ابوذر." },
+                    entry_miqdad: { title: "۲۰. مدخل المقداد بن الأسود", desc: "مسیر دسترسی مقداد." },
+                    entry_salman: { title: "۲۱. مدخل سلمان المحمدي", desc: "ورودی سلمان." },
+                    entry_ammar: { title: "۲۲. مدخل عمار بن ياسر", desc: "گذرگاه عمار یاسر." },
+                    sub_rest: { title: "استراحتگاه أم البنين (ع)", desc: "استراحتگاه مجهز زائرین." },
+                    sub_lost: { title: "واحد امانات و اشیاء گمشده", desc: "مرکز نگهداری امانات." },
+                    sub_parking: { title: "پارکینگ طبقاتی وادی‌السلام", desc: "پارکینگ خودروهای زائران." },
+                    wc_1: { title: "سرویس بهداشتی (غرب)", desc: "مجموعه بهداشتی عمومی." },
+                    wc_3: { title: "سرویس بهداشتی (شمال غربی)", desc: "مجموعه بهداشتی عمومی." },
+                    wc_4: { title: "سرویس بهداشتی (شمالی)", desc: "مجموعه بهداشتی عمومی." },
+                    wc_5: { title: "سرویس بهداشتی (شرقی)", desc: "مجموعه بهداشتی عمومی." }
                 }
             },
             en: {
-                title: "Shrine Places & Services", searchPlaceholder: "Search location, rest area, restroom...", myLocation: "📍 My Location", menuList: "Locations", darkMode: "🌙 Dark Mode", lightMode: "☀️ Light Mode", guideLabel: "Visitor Guide", audioBtn: "🔊 Play Audio", infoTitle: "Location Info", selectPrompt: "Click on pins to view details.", backHome: "Home",
+                title: "Shrine Places & Services", searchPlaceholder: "Search location, rest area, restroom...", myLocation: "📍 My Location", menuList: "Locations", darkMode: "🌙 Dark Mode", lightMode: "☀️ Light Mode", guideLabel: "Visitor Guide", audioBtn: "🔊 Play Audio", infoTitle: "Location Info", selectPrompt: "Click on pins to view details.", backHome: "Home", switchView: "Change View",
                 locs: {
-                    gate_qibla: { title: "1. Al-Qibla Gate", desc: "Primary southern entrance.", top: 83.5, left: 57.5 },
-                    gate_ridha: { title: "2. Imam Al-Rida Gate", desc: "Women entrance.", top: 76.5, left: 77.5 },
-                    gate_muslim: { title: "3. Muslim bin Aqeel Gate", desc: "Eastern access.", top: 71.0, left: 81.0 },
-                    gate_tusi: { title: "4. Al-Tusi Gate", desc: "Northern entrance.", top: 61.5, left: 74.0 },
-                    gate_hasan: { title: "5. Imam Al-Hassan Gate", desc: "Western women entry.", top: 79.5, left: 41.5 },
-                    gate_hussein: { title: "6. Imam Al-Hussein Gate", desc: "Courtyard access.", top: 48.0, left: 66.0 },
-                    gate_faraj: { title: "7. Al-Faraj Gate", desc: "Internal corridor.", top: 72.0, left: 60.5 },
-                    gate_khatam: { title: "8. Khatam Al-Anbiya Gate", desc: "Library entry.", top: 55.5, left: 29.0 },
-                    gate_awsiya: { title: "9. Sayyid Al-Awsiya Gate", desc: "Northern hub.", top: 51.5, left: 42.5 },
-                    gate_zahra: { title: "10. Sayyidat Al-Nisa Gate", desc: "Expansion zone entry.", top: 31.0, left: 16.5 },
-                    shrine_imran: { title: "11. Imram bin Shaheen Mosque", desc: "Historical mosque.", top: 59.5, left: 63.5 },
-                    shrine_gharawiya: { title: "12. Al-Gharawiya School", desc: "Seminary school.", top: 38.0, left: 53.0 },
-                    service_bridge: { title: "13. Abi Al-Fadhl Bridge", desc: "Overpass bridge.", top: 53.5, left: 37.0 },
-                    service_admin: { title: "14. General Administration", desc: "Admin headquarters.", top: 42.0, left: 21.5 },
-                    shrine_library: { title: "15. Rawda Library", desc: "Manuscripts library.", top: 51.0, left: 26.5 },
-                    service_guesthouse: { title: "16. Amir Guesthouse", desc: "Guesthouse.", top: 33.5, left: 31.5 },
-                    shrine_museum: { title: "17. Al-Alawi Museum", desc: "Museum.", top: 38.0, left: 35.5 },
-                    service_pilgrim: { title: "18. Pilgrims Guesthouse", desc: "Hosting unit.", top: 39.5, left: 25.0 },
-                    entry_abozar: { title: "19. Abo Dhar Entry", desc: "Passage route.", top: 81.0, left: 39.0 },
-                    entry_miqdad: { title: "20. AlMoqdad Entry", desc: "Access route.", top: 77.0, left: 41.5 },
-                    entry_salman: { title: "21. Salman Entry", desc: "Entry zone.", top: 51.5, left: 63.0 },
-                    entry_ammar: { title: "22. Ammar Entry", desc: "Northern passage.", top: 51.5, left: 59.5 },
-                    sub_rest: { title: "Umm Al-Baneen Rest Area", desc: "Rest zone.", top: 81.5, left: 29.5 },
-                    sub_lost: { title: "Lost & Found Unit", desc: "Safekeeping center.", top: 92.5, left: 41.5 },
-                    sub_parking: { title: "Wadi Al-Salam Parking", desc: "Parking facility.", top: 24.5, left: 91.5 },
-                    wc_1: { title: "Restroom (West)", desc: "Sanitary facility.", top: 76.5, left: 9.5 },
-                    wc_3: { title: "Restroom (North-West)", desc: "Sanitary facility.", top: 22.0, left: 11.5 },
-                    wc_4: { title: "Restroom (North)", desc: "Sanitary facility.", top: 22.5, left: 38.5 },
-                    wc_5: { title: "Restroom (East)", desc: "Sanitary facility.", top: 71.0, left: 91.5 }
+                    gate_qibla: { title: "1. Al-Qibla Gate", desc: "Primary southern entrance." },
+                    gate_ridha: { title: "2. Imam Al-Rida Gate", desc: "Women entrance." },
+                    gate_muslim: { title: "3. Muslim bin Aqeel Gate", desc: "Eastern access." },
+                    gate_tusi: { title: "4. Al-Tusi Gate", desc: "Northern entrance." },
+                    gate_hasan: { title: "5. Imam Al-Hassan Gate", desc: "Western women entry." },
+                    gate_hussein: { title: "6. Imam Al-Hussein Gate", desc: "Courtyard access." },
+                    gate_faraj: { title: "7. Al-Faraj Gate", desc: "Internal corridor." },
+                    gate_khatam: { title: "8. Khatam Al-Anbiya Gate", desc: "Library entry." },
+                    gate_awsiya: { title: "9. Sayyid Al-Awsiya Gate", desc: "Northern hub." },
+                    gate_zahra: { title: "10. Sayyidat Al-Nisa Gate", desc: "Expansion zone entry." },
+                    shrine_imran: { title: "11. Imram bin Shaheen Mosque", desc: "Historical mosque." },
+                    shrine_gharawiya: { title: "12. Al-Gharawiya School", desc: "Seminary school." },
+                    service_bridge: { title: "13. Abi Al-Fadhl Bridge", desc: "Overpass bridge." },
+                    service_admin: { title: "14. General Administration", desc: "Admin headquarters." },
+                    shrine_library: { title: "15. Rawda Library", desc: "Manuscripts library." },
+                    service_guesthouse: { title: "16. Amir Guesthouse", desc: "Guesthouse." },
+                    shrine_museum: { title: "17. Al-Alawi Museum", desc: "Museum." },
+                    service_pilgrim: { title: "18. Pilgrims Guesthouse", desc: "Hosting unit." },
+                    entry_abozar: { title: "19. Abo Dhar Entry", desc: "Passage route." },
+                    entry_miqdad: { title: "20. AlMoqdad Entry", desc: "Access route." },
+                    entry_salman: { title: "21. Salman Entry", desc: "Entry zone." },
+                    entry_ammar: { title: "22. Ammar Entry", desc: "Northern passage." },
+                    sub_rest: { title: "Umm Al-Baneen Rest Area", desc: "Rest zone." },
+                    sub_lost: { title: "Lost & Found Unit", desc: "Safekeeping center." },
+                    sub_parking: { title: "Wadi Al-Salam Parking", desc: "Parking facility." },
+                    wc_1: { title: "Restroom (West)", desc: "Sanitary facility." },
+                    wc_3: { title: "Restroom (North-West)", desc: "Sanitary facility." },
+                    wc_4: { title: "Restroom (North)", desc: "Sanitary facility." },
+                    wc_5: { title: "Restroom (East)", desc: "Sanitary facility." }
                 }
             }
         };
 
-        let currentLang = 'ar';
-
         function startApp(lang) {
-            document.getElementById('splashScreen').style.display = 'none';
-            document.getElementById('gisAppContainer').style.display = 'block';
+            const splash = document.getElementById('splashScreen');
+            const app = document.getElementById('gisAppContainer');
+            if (splash) splash.style.display = 'none';
+            if (app) app.style.display = 'block';
             changeLang(lang);
+            buildHotspotsForCurrentView();
             requestAnimationFrame(initView);
         }
 
@@ -520,6 +428,7 @@
             document.getElementById('btnGps').textContent = t.myLocation;
             document.getElementById('txtMenuList').textContent = t.menuList;
             document.getElementById('txtBackHome').textContent = t.backHome;
+            document.getElementById('txtSwitchView').textContent = t.switchView;
             document.getElementById('sidebarTitle').textContent = t.title;
             document.getElementById('gisSearchInput').placeholder = t.searchPlaceholder;
             document.getElementById('txtGuideLabel').textContent = t.guideLabel;
@@ -534,7 +443,8 @@
 
         const viewport = document.getElementById('mapViewport');
         const canvas = document.getElementById('mapCanvas');
-        const allHotspots = document.querySelectorAll('.hotspot, .sub-hotspot');
+        const mainMapImg = document.getElementById('mainMapImg');
+        const hotspotsContainer = document.getElementById('hotspotsContainer');
         const userPin = document.getElementById('userLocationPin');
         const hudPanel = document.getElementById('hudPanel');
         const hudTitle = document.getElementById('hudTitle');
@@ -548,8 +458,9 @@
         let isPanning = false, startX, startY;
         let activeItem = null;
         let activeKey = "";
+        let database = [];
+        let allHotspots = [];
 
-        // متغیرهای حرفه‌ای برای مدیریت زوم دو انگشتی (Pinch-to-Zoom دقیق)
         let initialPinchDistance = null;
         let startScale = 1;
         let pinchMidX = 0, pinchMidY = 0;
@@ -564,14 +475,92 @@
             if(vW === 0 || vH === 0) return;
             
             scale = Math.max(vW / 2400, vH / 1600);
-            
-            const targetX = 1200;
-            const targetY = 800;
-            
-            posX = (vW / 2) - (targetX * scale);
-            posY = (vH / 2) - (targetY * scale);
-            
+            posX = (vW / 2) - (1200 * scale);
+            posY = (vH / 2) - (800 * scale);
             updateTransform();
+        }
+
+        function buildHotspotsForCurrentView() {
+            hotspotsContainer.innerHTML = '';
+            database = [];
+
+            const currentView = viewsData[currentViewIndex];
+            mainMapImg.src = currentView.image;
+            const coordsMap = currentView.coords;
+
+            const definitions = [
+                { id: "1", key: "gate_qibla", type: "hotspot" },
+                { id: "2", key: "gate_ridha", type: "hotspot" },
+                { id: "3", key: "gate_muslim", type: "hotspot" },
+                { id: "4", key: "gate_tusi", type: "hotspot" },
+                { id: "5", key: "gate_hasan", type: "hotspot" },
+                { id: "6", key: "gate_hussein", type: "hotspot" },
+                { id: "7", key: "gate_faraj", type: "hotspot" },
+                { id: "8", key: "gate_khatam", type: "hotspot" },
+                { id: "9", key: "gate_awsiya", type: "hotspot" },
+                { id: "10", key: "gate_zahra", type: "hotspot" },
+                { id: "11", key: "shrine_imran", type: "hotspot" },
+                { id: "12", key: "shrine_gharawiya", type: "hotspot" },
+                { id: "13", key: "service_bridge", type: "hotspot" },
+                { id: "14", key: "service_admin", type: "hotspot" },
+                { id: "15", key: "shrine_library", type: "hotspot" },
+                { id: "16", key: "service_guesthouse", type: "hotspot" },
+                { id: "17", key: "shrine_museum", type: "hotspot" },
+                { id: "18", key: "service_pilgrim", type: "hotspot" },
+                { id: "19", key: "entry_abozar", type: "hotspot" },
+                { id: "20", key: "entry_miqdad", type: "hotspot" },
+                { id: "21", key: "entry_salman", type: "hotspot" },
+                { id: "22", key: "entry_ammar", type: "hotspot" },
+                { id: "S1", key: "sub_rest", type: "sub-hotspot", label: "💤" },
+                { id: "S2", key: "sub_lost", type: "sub-hotspot", label: "🎒" },
+                { id: "S3", key: "sub_parking", type: "sub-hotspot", label: "🅿️" },
+                { id: "WC1", key: "wc_1", type: "sub-hotspot wc", label: "🚻" },
+                { id: "WC3", key: "wc_3", type: "sub-hotspot wc", label: "🚻" },
+                { id: "WC4", key: "wc_4", type: "sub-hotspot wc", label: "🚻" },
+                { id: "WC5", key: "wc_5", type: "sub-hotspot wc", label: "🚻" }
+            ];
+
+            definitions.forEach(def => {
+                const pos = coordsMap[def.key];
+                if (!pos) return;
+
+                const spot = document.createElement('div');
+                spot.className = def.type;
+                spot.style.top = `${pos.top}%`;
+                spot.style.left = `${pos.left}%`;
+                spot.setAttribute('data-id', def.id);
+                spot.setAttribute('data-key', def.key);
+                spot.textContent = def.label ? def.label : def.id;
+
+                spot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const item = database.find(l => l.id === def.id);
+                    if(item) {
+                        showLocationInfo(item);
+                        smoothPanTo(item.left, item.top);
+                    }
+                });
+
+                hotspotsContainer.appendChild(spot);
+
+                database.push({
+                    id: def.id,
+                    key: def.key,
+                    top: pos.top,
+                    left: pos.left,
+                    element: spot
+                });
+            });
+
+            allHotspots = hotspotsContainer.querySelectorAll('.hotspot, .sub-hotspot');
+            renderRecords(database);
+        }
+
+        function switchNextView() {
+            currentViewIndex = (currentViewIndex + 1) % viewsData.length;
+            closeHud();
+            buildHotspotsForCurrentView();
+            initView();
         }
 
         function smoothPanTo(targetLeftPct, targetTopPct) {
@@ -610,7 +599,6 @@
 
         window.addEventListener('resize', initView);
 
-        // رویدادهای ماوس (دسکتاپ)
         viewport.addEventListener('mousedown', (e) => {
             isPanning = true; 
             startX = e.clientX - posX; 
@@ -624,7 +612,6 @@
         });
         window.addEventListener('mouseup', () => { isPanning = false; });
 
-        // رویدادهای لمسی اصلاح‌شده و دقیق برای موبایل (جابجایی تک‌انگشتی + زوم دو انگشتی روان)
         viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isPanning = true;
@@ -672,7 +659,6 @@
             if (e.touches.length === 0) isPanning = false;
         });
 
-        // اسکرول ماوس برای زوم
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const zoomRate = 0.12, prevScale = scale;
@@ -710,8 +696,10 @@
         }
 
         function locateUser() {
-            showUserPin(57.5, 83.5);
-            smoothPanTo(57.5, 83.5);
+            const currentView = viewsData[currentViewIndex];
+            const defaultPos = currentView.coords.gate_qibla;
+            showUserPin(defaultPos.left, defaultPos.top);
+            smoothPanTo(defaultPos.left, defaultPos.top);
         }
 
         function showUserPin(leftPct, topPct) {
@@ -757,23 +745,6 @@
             }
         }
 
-        const database = [];
-        allHotspots.forEach(spot => {
-            const key = spot.getAttribute('data-key');
-            const loc = translations.ar.locs[key];
-            if (loc) {
-                const topVal = parseFloat(spot.style.top);
-                const leftVal = parseFloat(spot.style.left);
-                database.push({
-                    id: spot.getAttribute('data-id'),
-                    key: key,
-                    top: topVal,
-                    left: leftVal,
-                    element: spot
-                });
-            }
-        });
-
         function renderRecords(arr) {
             gisRecordsList.innerHTML = '';
             const t = translations[currentLang];
@@ -813,18 +784,6 @@
 
             hudPanel.classList.add('visible');
         }
-
-        allHotspots.forEach(spot => {
-            spot.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = spot.getAttribute('data-id');
-                const item = database.find(l => l.id === id);
-                if(item) {
-                    showLocationInfo(item);
-                    smoothPanTo(item.left, item.top);
-                }
-            });
-        });
 
         gisSearchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
